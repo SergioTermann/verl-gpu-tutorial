@@ -1,5 +1,9 @@
 # Interactive verl GPU Tutorial
 
+**English** | [简体中文](README.zh-CN.md)
+
+The lessons are written in Chinese. Chinese-speaking learners can start with the [中文学习入口](README.zh-CN.md).
+
 A 12-lesson Jupyter course covering GPU basics, supervised fine-tuning, GRPO concepts, model evaluation, reproducibility, and a real single-GPU verl training run with failure diagnosis.
 
 [Course home](tutorial/00_START_HERE.ipynb) · [Lesson index](tutorial/README.md) · [Advanced lessons](tutorial/ADVANCED.md)
