@@ -8,3 +8,4 @@ __pycache__/
 latest_run.txt
 .env
 /outputs/
+slime_tutorial/results/

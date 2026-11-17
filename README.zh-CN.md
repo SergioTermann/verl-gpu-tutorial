@@ -35,6 +35,8 @@
 
 第 17 课首次运行下载约 1GB 的固定版本 Qwen2.5-0.5B-Instruct，需 PEFT；基础模型与合并模型占用额外磁盘，权重在仓库外保存，遵循模型自身许可。第 18 课只启动临时本机服务，测试结束后自动关闭，不开放公网访问。
 
+另有独立的 [slime 学习系列](slime_tutorial/README.md)，讲解 Megatron 训练、SGLang rollout、Ray 编排、Sample/奖励契约和分离调试。该系列使用固定版本的上游 slime checkout，与 verl 课程使用不同环境。
+
 首次学习建议按顺序执行，各课之间有模型和数据依赖。Notebook 已清空运行输出，模型权重和检查点需要在本地生成；仓库中的小型 JSON/CSV 保留历史实测结果供参考。
 
 ## 本地运行

@@ -12,6 +12,8 @@ For a research-to-engineering learning path, see the Chinese [engineering roadma
 
 Lessons [17](tutorial/17_pretrained_lora.ipynb) and [18](tutorial/18_streaming_service_benchmark.ipynb) use a pinned Qwen2.5-0.5B-Instruct checkpoint (about 1 GB to download). Install `peft` in the compatible environment if needed. Base and merged weights remain outside this repository and retain the model's license. The temporary vLLM service binds only to `127.0.0.1` and shuts down after benchmarking. These experiments do not validate larger-model or multi-GPU deployment.
 
+For a separate **slime** track, see [`slime_tutorial/README.md`](slime_tutorial/README.md). It covers Megatron training, SGLang rollout, Ray orchestration, `Sample`/reward contracts, and debug-only workflows against a pinned upstream checkout. It is a separate environment from the verl lessons.
+
 ## Setup
 
 This repository is a standalone tutorial package; it does not contain the verl framework source. Use it with [verl v0.7.1](https://github.com/volcengine/verl/tree/v0.7.1) and follow the official installation instructions for a Linux or WSL2 CUDA environment.
