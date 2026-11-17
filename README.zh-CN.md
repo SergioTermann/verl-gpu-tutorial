@@ -28,8 +28,12 @@
 | [14：SFT 预热与 verl](tutorial/14_sft_warmup_and_verl.ipynb) | 修复冷启动、固定评估与真实训练接口 |
 | [15：评估不确定性](tutorial/15_evaluation_and_uncertainty.ipynb) | 配对比较、bootstrap、多种子与实验设计 |
 | [16：显存与吞吐](tutorial/16_memory_and_throughput.ipynb) | 资源预算、CUDA 计时、混合精度与瓶颈 |
+| [17：预训练模型 LoRA](tutorial/17_pretrained_lora.ipynb) | 聊天模板、回答掩码、适配器与合并验证 |
+| [18：本地流式服务](tutorial/18_streaming_service_benchmark.ipynb) | vLLM、HTTP 流式响应、并发与答案回归 |
 
-希望独立开展大模型工程实践，请结合[工程学习路线与考核](tutorial/ENGINEERING_ROADMAP.md)。其中明确列出了预训练模型 LoRA、多卡恢复和服务压测等尚待完成的项目。
+希望独立开展大模型工程实践，请结合[工程学习路线与考核](tutorial/ENGINEERING_ROADMAP.md)。17/18 已补入预训练模型 LoRA 和本地服务实验；多卡恢复、更大模型及生产负载仍需单独验证。
+
+第 17 课首次运行下载约 1GB 的固定版本 Qwen2.5-0.5B-Instruct，需 PEFT；基础模型与合并模型占用额外磁盘，权重在仓库外保存，遵循模型自身许可。第 18 课只启动临时本机服务，测试结束后自动关闭，不开放公网访问。
 
 首次学习建议按顺序执行，各课之间有模型和数据依赖。Notebook 已清空运行输出，模型权重和检查点需要在本地生成；仓库中的小型 JSON/CSV 保留历史实测结果供参考。
 

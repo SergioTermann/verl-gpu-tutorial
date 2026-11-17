@@ -1,0 +1,38 @@
+{
+  "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+  "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+  "seed": 17017,
+  "steps": 60,
+  "lora_rank": 8,
+  "lora_alpha": 16,
+  "targets": [
+    "q_proj",
+    "v_proj"
+  ],
+  "learning_rate": 0.0003,
+  "microbatch": 2,
+  "gradient_accumulation": 4,
+  "effective_batch": 8,
+  "max_length": 160,
+  "trainable_parameters": 540672,
+  "total_parameters": 494573440,
+  "base_sample_hash_unchanged": true,
+  "adapter_max_change": 0.013874106109142303,
+  "data_sha256": "599e54d1c4fde370d7faf6ea64549b800e30bf863e309de506145ab923a984ab",
+  "elapsed_seconds_including_validation": 20.885054027006845,
+  "peak_allocated_gib": 1.2339844703674316,
+  "torch": "2.8.0+cu128",
+  "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "diagnostic_first_loss": 0.38679149746894836,
+  "diagnostic_last_loss": 0.00033850272302515805,
+  "diagnostic_reset": true,
+  "training_dtype": "BF16 base; FP32 LoRA parameters",
+  "scope": "Synthetic ticket routing; holdout by template family; one seed; no full-finetune control.",
+  "source_note": "Expected upstream revision; file hashes identify actual local artifacts, including overrides.",
+  "base_weights_sha256": {
+    "model.safetensors": "fdf756fa7fcbe7404d5c60e26bff1a0c8b8aa1f72ced49e7dd0210fe288fb7fe"
+  },
+  "tokenizer_sha256": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+  "transformers": "4.57.1",
+  "peft": "0.17.1"
+}

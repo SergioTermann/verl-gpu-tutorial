@@ -4,11 +4,13 @@
 
 The lessons are written in Chinese. Chinese-speaking learners can start with the [中文学习入口](README.zh-CN.md).
 
-A 16-lesson Jupyter course covering GPU basics, supervised fine-tuning, GRPO, reproducibility, real single-GPU verl training, failure diagnosis, gradient checks, evaluation uncertainty, and memory/throughput measurement.
+An 18-lesson Jupyter course covering GPU basics, supervised fine-tuning, GRPO, reproducibility, real single-GPU verl training, failure diagnosis, gradient checks, evaluation uncertainty, memory/throughput measurement, pretrained-model LoRA, and local streaming-service benchmarks.
 
 [Course home](tutorial/00_START_HERE.ipynb) · [Lesson index](tutorial/README.md) · [Advanced lessons](tutorial/ADVANCED.md)
 
 For a research-to-engineering learning path, see the Chinese [engineering roadmap and assessment](tutorial/ENGINEERING_ROADMAP.md). Lessons 13–16 add executable exercises and distinguish micro-model evidence from larger-model, multi-GPU, and serving work still to be validated.
+
+Lessons [17](tutorial/17_pretrained_lora.ipynb) and [18](tutorial/18_streaming_service_benchmark.ipynb) use a pinned Qwen2.5-0.5B-Instruct checkpoint (about 1 GB to download). Install `peft` in the compatible environment if needed. Base and merged weights remain outside this repository and retain the model's license. The temporary vLLM service binds only to `127.0.0.1` and shuts down after benchmarking. These experiments do not validate larger-model or multi-GPU deployment.
 
 ## Setup
 

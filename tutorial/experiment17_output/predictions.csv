@@ -1,0 +1,49 @@
+id,group,text,target,split,stage,answer,valid,correct,eos
+R0-8-0,R0-8,Ticket 132: The receipt shows a different price from checkout.,route=R0,test,base,route=R0,True,True,True
+R0-8-1,R0-8,Ticket 133: The receipt shows a different price from checkout.,route=R0,test,base,route=R0,True,True,True
+R0-8-2,R0-8,Ticket 134: The receipt shows a different price from checkout.,route=R0,test,base,route=R0,True,True,True
+R0-8-3,R0-8,Ticket 135: The receipt shows a different price from checkout.,route=R0,test,base,route=R0,True,True,True
+R0-9-0,R0-9,Ticket 136: I want to dispute a debit on my statement.,route=R0,test,base,route=R0,True,True,True
+R0-9-1,R0-9,Ticket 137: I want to dispute a debit on my statement.,route=R0,test,base,route=R0,True,True,True
+R0-9-2,R0-9,Ticket 138: I want to dispute a debit on my statement.,route=R0,test,base,route=R0,True,True,True
+R0-9-3,R0-9,Ticket 139: I want to dispute a debit on my statement.,route=R0,test,base,route=R0,True,True,True
+R1-8-0,R1-8,Ticket 132: The service says my credentials are invalid.,route=R1,test,base,route=R0,True,False,True
+R1-8-1,R1-8,Ticket 133: The service says my credentials are invalid.,route=R1,test,base,route=R0,True,False,True
+R1-8-2,R1-8,Ticket 134: The service says my credentials are invalid.,route=R1,test,base,route=R0,True,False,True
+R1-8-3,R1-8,Ticket 135: The service says my credentials are invalid.,route=R1,test,base,route=R0,True,False,True
+R1-9-0,R1-9,Ticket 136: I cannot complete two-factor authentication.,route=R1,test,base,route=R0,True,False,True
+R1-9-1,R1-9,Ticket 137: I cannot complete two-factor authentication.,route=R1,test,base,route=R0,True,False,True
+R1-9-2,R1-9,Ticket 138: I cannot complete two-factor authentication.,route=R1,test,base,route=R0,True,False,True
+R1-9-3,R1-9,Ticket 139: I cannot complete two-factor authentication.,route=R1,test,base,route=R0,True,False,True
+R2-8-0,R2-8,Ticket 132: The carrier has sent my parcel back to the sender.,route=R2,test,base,route=R0,True,False,True
+R2-8-1,R2-8,Ticket 133: The carrier has sent my parcel back to the sender.,route=R2,test,base,route=R0,True,False,True
+R2-8-2,R2-8,Ticket 134: The carrier has sent my parcel back to the sender.,route=R2,test,base,route=R0,True,False,True
+R2-8-3,R2-8,Ticket 135: The carrier has sent my parcel back to the sender.,route=R2,test,base,route=R0,True,False,True
+R2-9-0,R2-9,Ticket 136: Where can I collect the shipment after a missed drop-off?,route=R2,test,base,route=R2,True,True,True
+R2-9-1,R2-9,Ticket 137: Where can I collect the shipment after a missed drop-off?,route=R2,test,base,route=R2,True,True,True
+R2-9-2,R2-9,Ticket 138: Where can I collect the shipment after a missed drop-off?,route=R2,test,base,route=R2,True,True,True
+R2-9-3,R2-9,Ticket 139: Where can I collect the shipment after a missed drop-off?,route=R2,test,base,route=R2,True,True,True
+R0-8-0,R0-8,Ticket 132: The receipt shows a different price from checkout.,route=R0,test,lora,route=R2,True,False,True
+R0-8-1,R0-8,Ticket 133: The receipt shows a different price from checkout.,route=R0,test,lora,route=R2,True,False,True
+R0-8-2,R0-8,Ticket 134: The receipt shows a different price from checkout.,route=R0,test,lora,route=R2,True,False,True
+R0-8-3,R0-8,Ticket 135: The receipt shows a different price from checkout.,route=R0,test,lora,route=R2,True,False,True
+R0-9-0,R0-9,Ticket 136: I want to dispute a debit on my statement.,route=R0,test,lora,route=R0,True,True,True
+R0-9-1,R0-9,Ticket 137: I want to dispute a debit on my statement.,route=R0,test,lora,route=R0,True,True,True
+R0-9-2,R0-9,Ticket 138: I want to dispute a debit on my statement.,route=R0,test,lora,route=R0,True,True,True
+R0-9-3,R0-9,Ticket 139: I want to dispute a debit on my statement.,route=R0,test,lora,route=R0,True,True,True
+R1-8-0,R1-8,Ticket 132: The service says my credentials are invalid.,route=R1,test,lora,route=R1,True,True,True
+R1-8-1,R1-8,Ticket 133: The service says my credentials are invalid.,route=R1,test,lora,route=R1,True,True,True
+R1-8-2,R1-8,Ticket 134: The service says my credentials are invalid.,route=R1,test,lora,route=R1,True,True,True
+R1-8-3,R1-8,Ticket 135: The service says my credentials are invalid.,route=R1,test,lora,route=R1,True,True,True
+R1-9-0,R1-9,Ticket 136: I cannot complete two-factor authentication.,route=R1,test,lora,route=R1,True,True,True
+R1-9-1,R1-9,Ticket 137: I cannot complete two-factor authentication.,route=R1,test,lora,route=R1,True,True,True
+R1-9-2,R1-9,Ticket 138: I cannot complete two-factor authentication.,route=R1,test,lora,route=R1,True,True,True
+R1-9-3,R1-9,Ticket 139: I cannot complete two-factor authentication.,route=R1,test,lora,route=R1,True,True,True
+R2-8-0,R2-8,Ticket 132: The carrier has sent my parcel back to the sender.,route=R2,test,lora,route=R2,True,True,True
+R2-8-1,R2-8,Ticket 133: The carrier has sent my parcel back to the sender.,route=R2,test,lora,route=R2,True,True,True
+R2-8-2,R2-8,Ticket 134: The carrier has sent my parcel back to the sender.,route=R2,test,lora,route=R2,True,True,True
+R2-8-3,R2-8,Ticket 135: The carrier has sent my parcel back to the sender.,route=R2,test,lora,route=R2,True,True,True
+R2-9-0,R2-9,Ticket 136: Where can I collect the shipment after a missed drop-off?,route=R2,test,lora,route=R2,True,True,True
+R2-9-1,R2-9,Ticket 137: Where can I collect the shipment after a missed drop-off?,route=R2,test,lora,route=R2,True,True,True
+R2-9-2,R2-9,Ticket 138: Where can I collect the shipment after a missed drop-off?,route=R2,test,lora,route=R2,True,True,True
+R2-9-3,R2-9,Ticket 139: Where can I collect the shipment after a missed drop-off?,route=R2,test,lora,route=R2,True,True,True

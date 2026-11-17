@@ -351,11 +351,13 @@ md('''## 高级课程
 | [14：SFT 预热与 verl](14_sft_warmup_and_verl.ipynb) | 预热能否改善协议与任务表现？ | CUDA；真实 GRPO 是单独启动的可选步骤 |
 | [15：评估不确定性](15_evaluation_and_uncertainty.ipynb) | 改善有多大，证据有多强？ | 第 14 课逐题预测，CPU 即可 |
 | [16：显存与吞吐](16_memory_and_throughput.ipynb) | 资源花在哪里，怎样正确计时？ | CUDA，无前课权重依赖 |
+| [17：预训练模型 LoRA](17_pretrained_lora.ipynb) | 模板、掩码、适配器重载与合并是否可靠？ | CUDA、PEFT；首次下载约 1GB 权重 |
+| [18：本地流式服务](18_streaming_service_benchmark.ipynb) | 服务输出与并发指标是否可信？ | 第 17 课合并模型、vLLM；仅监听本机 |
 
 第 11 课使用合成奖励验证工程链路。第 12 课的历史结果是 10 步中 3 步非零梯度，贪心测试准确率未改善。第 14 课更换词表和数据范围，属于独立实验，不与第 12 课直接作同条件因果比较。
 
 首次克隆后没有本地模型、日志和检查点。请先执行相应训练；公开 Notebook 已清空输出，小型 JSON/CSV 是历史运行记录。每次训练以本轮配置与输出为准。
 
-学习要求、缺口审阅和后续 LoRA、多卡、服务项目见 [工程学习路线与考核](ENGINEERING_ROADMAP.md)。
+学习要求、缺口审阅和后续全量微调对照、多卡及生产负载项目见 [工程学习路线与考核](ENGINEERING_ROADMAP.md)。
 ''')
 save('00_START_HERE.ipynb')

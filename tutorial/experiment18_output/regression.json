@@ -1,0 +1,7 @@
+{
+  "requests": 216,
+  "errors": 0,
+  "answer_disagreements": 0,
+  "accuracy_including_errors": 0.8333333333333334,
+  "note": "Repeated short synthetic prompts; not independent samples or a production SLA."
+}

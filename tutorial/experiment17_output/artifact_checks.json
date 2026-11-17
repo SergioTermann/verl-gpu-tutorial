@@ -1,0 +1,11 @@
+{
+  "reload_max_absolute_difference": 0.0,
+  "fp32_merge_relative_l2": 3.1676697744842386e-06,
+  "bf16_direct_merge_relative_l2": 0.0424204021692276,
+  "bf16_direct_merge_passed_002": false,
+  "merge_answer_disagreements": 0,
+  "probe_split": "validation",
+  "fp32_merge_tolerance": 0.0001,
+  "exported_dtype": "float32",
+  "test_examples": 24
+}

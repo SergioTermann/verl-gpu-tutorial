@@ -29,3 +29,30 @@ GRPO 测试说明预热模型可以通过导出的 tokenizer、Parquet 和奖励
 按 README 配置环境，运行四本 Notebook。第 14 课导出模型后，在终端执行其打印的 `VERL_ADV14_ROOT=... bash tutorial/advanced14/run_grpo.sh`；成功后将第 5 节的 `READ_GRPO=True` 再运行，即可从检查点重新评估并保存指标。读取只适用于自己生成的可信检查点。
 
 大型权重、训练原始日志与包含本机路径的运行指针未提交。代码会为新实验创建独立运行目录；再次执行报告保存格会覆盖工作区内同名小型报告。需要比较多个种子时，先为报告建立独立目录并保留每轮实验卡。
+
+## 第 17 课：预训练 Qwen LoRA
+
+2026-11-17 使用 Qwen2.5-0.5B-Instruct 固定 revision、PEFT 0.17.1、transformers 4.57.1，在同一参考 GPU 上完整执行。正式训练为 60 次更新，LoRA 可训练参数 540,672，总参数 494,573,440。小批量诊断损失下降后，适配器和优化器已重置再开始正式训练。
+
+- 冻结基础模型：12/24 正确，50%；LoRA：20/24 正确，83.3%。合法格式比例均为 100%。
+- 测试集只有 6 个语义模板组，每组四种编号变化。24 条记录不能视为 24 个独立语义样本，结果不证明真实工单泛化能力。
+- LoRA 仍把 `The receipt shows a different price from checkout.` 归到物流，四条编号变体均错误。错误完整保留。
+- 重新加载 adapter 后，固定验证输入的 logits 最大绝对差为 0。
+- 第一次 BF16 直接合并未通过原先的 0.02 相对 L2 检查线，误差为 0.04242。未放宽阈值；改在 FP32 下检查合并，误差为 0.000003168，通过预设 1e-4 阈值。
+- 导出 FP32 合并产物，在测试集上与 BF16 LoRA 的答案无分歧。这个答案一致性不代表所有输入或数值逐位一致。
+
+证据：[manifest](experiment17_output/manifest.json)、[合并与重载检查](experiment17_output/artifact_checks.json)、[逐题预测](experiment17_output/predictions.csv)、[合并模型预测](experiment17_output/merged_predictions.csv)、[数据划分](experiment17_output/dataset.json)。
+
+## 第 18 课：本地 vLLM 流式服务
+
+服务显式将 FP32 产物加载为 BF16，vLLM 0.11.0，仅监听 127.0.0.1。216 个计分请求加 1 个 warm-up 请求全部完成，计分请求无 HTTP/流式协议失败，与 transformers 合并模型答案无分歧。服务准确率为 83.3%，反映第 17 课同一组错误，没有把“服务成功”等同于“任务全对”。服务退出后已确认端口不再监听。
+
+| 并发 | 计分请求 | 输出 token/s | TTFT p95（ms） | 端到端 p95（ms） |
+|---|---:|---:|---:|---:|
+| 1 | 72 | 106.7 | 22.5 | 45.1 |
+| 2 | 72 | 190.4 | 26.6 | 48.7 |
+| 4 | 72 | 299.2 | 39.4 | 60.8 |
+
+这是短输出、关闭前缀缓存、eager 模式、闭环固定并发下的客户端测量。请求开始前在线程池内的等待不计入逐请求延迟；总吞吐窗口包含整个批次。不能将这些数字当作长输出、固定外部到达率或生产 SLA。启动耗时约 30 秒，单独记录，未计入稳态吞吐。
+
+证据：[逐请求指标](experiment18_output/requests.csv)、[分轮窗口](experiment18_output/windows.csv)、[汇总](experiment18_output/summary.csv)、[协议](experiment18_output/protocol.json)、[答案回归](experiment18_output/regression.json)。

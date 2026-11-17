@@ -1,0 +1,848 @@
+{
+  "train": [
+    {
+      "id": "R0-0-0",
+      "group": "R0-0",
+      "text": "Ticket 100: My card was charged twice for one order.",
+      "target": "route=R0",
+      "split": "train"
+    },
+    {
+      "id": "R0-0-1",
+      "group": "R0-0",
+      "text": "Ticket 101: My card was charged twice for one order.",
+      "target": "route=R0",
+      "split": "train"
+    },
+    {
+      "id": "R0-0-2",
+      "group": "R0-0",
+      "text": "Ticket 102: My card was charged twice for one order.",
+      "target": "route=R0",
+      "split": "train"
+    },
+    {
+      "id": "R0-0-3",
+      "group": "R0-0",
+      "text": "Ticket 103: My card was charged twice for one order.",
+      "target": "route=R0",
+      "split": "train"
+    },
+    {
+      "id": "R0-1-0",
+      "group": "R0-1",
+      "text": "Ticket 104: I need a copy of my invoice.",
+      "target": "route=R0",
+      "split": "train"
+    },
+    {
+      "id": "R0-1-1",
+      "group": "R0-1",
+      "text": "Ticket 105: I need a copy of my invoice.",
+      "target": "route=R0",
+      "split": "train"
+    },
+    {
+      "id": "R0-1-2",
+      "group": "R0-1",
+      "text": "Ticket 106: I need a copy of my invoice.",
+      "target": "route=R0",
+      "split": "train"
+    },
+    {
+      "id": "R0-1-3",
+      "group": "R0-1",
+      "text": "Ticket 107: I need a copy of my invoice.",
+      "target": "route=R0",
+      "split": "train"
+    },
+    {
+      "id": "R0-2-0",
+      "group": "R0-2",
+      "text": "Ticket 108: The refund has not reached my bank.",
+      "target": "route=R0",
+      "split": "train"
+    },
+    {
+      "id": "R0-2-1",
+      "group": "R0-2",
+      "text": "Ticket 109: The refund has not reached my bank.",
+      "target": "route=R0",
+      "split": "train"
+    },
+    {
+      "id": "R0-2-2",
+      "group": "R0-2",
+      "text": "Ticket 110: The refund has not reached my bank.",
+      "target": "route=R0",
+      "split": "train"
+    },
+    {
+      "id": "R0-2-3",
+      "group": "R0-2",
+      "text": "Ticket 111: The refund has not reached my bank.",
+      "target": "route=R0",
+      "split": "train"
+    },
+    {
+      "id": "R0-3-0",
+      "group": "R0-3",
+      "text": "Ticket 112: The amount on my bill is wrong.",
+      "target": "route=R0",
+      "split": "train"
+    },
+    {
+      "id": "R0-3-1",
+      "group": "R0-3",
+      "text": "Ticket 113: The amount on my bill is wrong.",
+      "target": "route=R0",
+      "split": "train"
+    },
+    {
+      "id": "R0-3-2",
+      "group": "R0-3",
+      "text": "Ticket 114: The amount on my bill is wrong.",
+      "target": "route=R0",
+      "split": "train"
+    },
+    {
+      "id": "R0-3-3",
+      "group": "R0-3",
+      "text": "Ticket 115: The amount on my bill is wrong.",
+      "target": "route=R0",
+      "split": "train"
+    },
+    {
+      "id": "R0-4-0",
+      "group": "R0-4",
+      "text": "Ticket 116: Can I change my payment method?",
+      "target": "route=R0",
+      "split": "train"
+    },
+    {
+      "id": "R0-4-1",
+      "group": "R0-4",
+      "text": "Ticket 117: Can I change my payment method?",
+      "target": "route=R0",
+      "split": "train"
+    },
+    {
+      "id": "R0-4-2",
+      "group": "R0-4",
+      "text": "Ticket 118: Can I change my payment method?",
+      "target": "route=R0",
+      "split": "train"
+    },
+    {
+      "id": "R0-4-3",
+      "group": "R0-4",
+      "text": "Ticket 119: Can I change my payment method?",
+      "target": "route=R0",
+      "split": "train"
+    },
+    {
+      "id": "R0-5-0",
+      "group": "R0-5",
+      "text": "Ticket 120: A payment failed although my card works.",
+      "target": "route=R0",
+      "split": "train"
+    },
+    {
+      "id": "R0-5-1",
+      "group": "R0-5",
+      "text": "Ticket 121: A payment failed although my card works.",
+      "target": "route=R0",
+      "split": "train"
+    },
+    {
+      "id": "R0-5-2",
+      "group": "R0-5",
+      "text": "Ticket 122: A payment failed although my card works.",
+      "target": "route=R0",
+      "split": "train"
+    },
+    {
+      "id": "R0-5-3",
+      "group": "R0-5",
+      "text": "Ticket 123: A payment failed although my card works.",
+      "target": "route=R0",
+      "split": "train"
+    },
+    {
+      "id": "R1-0-0",
+      "group": "R1-0",
+      "text": "Ticket 100: I cannot sign in to my account.",
+      "target": "route=R1",
+      "split": "train"
+    },
+    {
+      "id": "R1-0-1",
+      "group": "R1-0",
+      "text": "Ticket 101: I cannot sign in to my account.",
+      "target": "route=R1",
+      "split": "train"
+    },
+    {
+      "id": "R1-0-2",
+      "group": "R1-0",
+      "text": "Ticket 102: I cannot sign in to my account.",
+      "target": "route=R1",
+      "split": "train"
+    },
+    {
+      "id": "R1-0-3",
+      "group": "R1-0",
+      "text": "Ticket 103: I cannot sign in to my account.",
+      "target": "route=R1",
+      "split": "train"
+    },
+    {
+      "id": "R1-1-0",
+      "group": "R1-1",
+      "text": "Ticket 104: I forgot my password.",
+      "target": "route=R1",
+      "split": "train"
+    },
+    {
+      "id": "R1-1-1",
+      "group": "R1-1",
+      "text": "Ticket 105: I forgot my password.",
+      "target": "route=R1",
+      "split": "train"
+    },
+    {
+      "id": "R1-1-2",
+      "group": "R1-1",
+      "text": "Ticket 106: I forgot my password.",
+      "target": "route=R1",
+      "split": "train"
+    },
+    {
+      "id": "R1-1-3",
+      "group": "R1-1",
+      "text": "Ticket 107: I forgot my password.",
+      "target": "route=R1",
+      "split": "train"
+    },
+    {
+      "id": "R1-2-0",
+      "group": "R1-2",
+      "text": "Ticket 108: The password reset link does not work.",
+      "target": "route=R1",
+      "split": "train"
+    },
+    {
+      "id": "R1-2-1",
+      "group": "R1-2",
+      "text": "Ticket 109: The password reset link does not work.",
+      "target": "route=R1",
+      "split": "train"
+    },
+    {
+      "id": "R1-2-2",
+      "group": "R1-2",
+      "text": "Ticket 110: The password reset link does not work.",
+      "target": "route=R1",
+      "split": "train"
+    },
+    {
+      "id": "R1-2-3",
+      "group": "R1-2",
+      "text": "Ticket 111: The password reset link does not work.",
+      "target": "route=R1",
+      "split": "train"
+    },
+    {
+      "id": "R1-3-0",
+      "group": "R1-3",
+      "text": "Ticket 112: My account is locked.",
+      "target": "route=R1",
+      "split": "train"
+    },
+    {
+      "id": "R1-3-1",
+      "group": "R1-3",
+      "text": "Ticket 113: My account is locked.",
+      "target": "route=R1",
+      "split": "train"
+    },
+    {
+      "id": "R1-3-2",
+      "group": "R1-3",
+      "text": "Ticket 114: My account is locked.",
+      "target": "route=R1",
+      "split": "train"
+    },
+    {
+      "id": "R1-3-3",
+      "group": "R1-3",
+      "text": "Ticket 115: My account is locked.",
+      "target": "route=R1",
+      "split": "train"
+    },
+    {
+      "id": "R1-4-0",
+      "group": "R1-4",
+      "text": "Ticket 116: The login verification code never arrives.",
+      "target": "route=R1",
+      "split": "train"
+    },
+    {
+      "id": "R1-4-1",
+      "group": "R1-4",
+      "text": "Ticket 117: The login verification code never arrives.",
+      "target": "route=R1",
+      "split": "train"
+    },
+    {
+      "id": "R1-4-2",
+      "group": "R1-4",
+      "text": "Ticket 118: The login verification code never arrives.",
+      "target": "route=R1",
+      "split": "train"
+    },
+    {
+      "id": "R1-4-3",
+      "group": "R1-4",
+      "text": "Ticket 119: The login verification code never arrives.",
+      "target": "route=R1",
+      "split": "train"
+    },
+    {
+      "id": "R1-5-0",
+      "group": "R1-5",
+      "text": "Ticket 120: My authenticator code is rejected.",
+      "target": "route=R1",
+      "split": "train"
+    },
+    {
+      "id": "R1-5-1",
+      "group": "R1-5",
+      "text": "Ticket 121: My authenticator code is rejected.",
+      "target": "route=R1",
+      "split": "train"
+    },
+    {
+      "id": "R1-5-2",
+      "group": "R1-5",
+      "text": "Ticket 122: My authenticator code is rejected.",
+      "target": "route=R1",
+      "split": "train"
+    },
+    {
+      "id": "R1-5-3",
+      "group": "R1-5",
+      "text": "Ticket 123: My authenticator code is rejected.",
+      "target": "route=R1",
+      "split": "train"
+    },
+    {
+      "id": "R2-0-0",
+      "group": "R2-0",
+      "text": "Ticket 100: My parcel has not arrived.",
+      "target": "route=R2",
+      "split": "train"
+    },
+    {
+      "id": "R2-0-1",
+      "group": "R2-0",
+      "text": "Ticket 101: My parcel has not arrived.",
+      "target": "route=R2",
+      "split": "train"
+    },
+    {
+      "id": "R2-0-2",
+      "group": "R2-0",
+      "text": "Ticket 102: My parcel has not arrived.",
+      "target": "route=R2",
+      "split": "train"
+    },
+    {
+      "id": "R2-0-3",
+      "group": "R2-0",
+      "text": "Ticket 103: My parcel has not arrived.",
+      "target": "route=R2",
+      "split": "train"
+    },
+    {
+      "id": "R2-1-0",
+      "group": "R2-1",
+      "text": "Ticket 104: The tracking page has stopped updating.",
+      "target": "route=R2",
+      "split": "train"
+    },
+    {
+      "id": "R2-1-1",
+      "group": "R2-1",
+      "text": "Ticket 105: The tracking page has stopped updating.",
+      "target": "route=R2",
+      "split": "train"
+    },
+    {
+      "id": "R2-1-2",
+      "group": "R2-1",
+      "text": "Ticket 106: The tracking page has stopped updating.",
+      "target": "route=R2",
+      "split": "train"
+    },
+    {
+      "id": "R2-1-3",
+      "group": "R2-1",
+      "text": "Ticket 107: The tracking page has stopped updating.",
+      "target": "route=R2",
+      "split": "train"
+    },
+    {
+      "id": "R2-2-0",
+      "group": "R2-2",
+      "text": "Ticket 108: Please change the delivery address.",
+      "target": "route=R2",
+      "split": "train"
+    },
+    {
+      "id": "R2-2-1",
+      "group": "R2-2",
+      "text": "Ticket 109: Please change the delivery address.",
+      "target": "route=R2",
+      "split": "train"
+    },
+    {
+      "id": "R2-2-2",
+      "group": "R2-2",
+      "text": "Ticket 110: Please change the delivery address.",
+      "target": "route=R2",
+      "split": "train"
+    },
+    {
+      "id": "R2-2-3",
+      "group": "R2-2",
+      "text": "Ticket 111: Please change the delivery address.",
+      "target": "route=R2",
+      "split": "train"
+    },
+    {
+      "id": "R2-3-0",
+      "group": "R2-3",
+      "text": "Ticket 112: My package was delivered to the wrong house.",
+      "target": "route=R2",
+      "split": "train"
+    },
+    {
+      "id": "R2-3-1",
+      "group": "R2-3",
+      "text": "Ticket 113: My package was delivered to the wrong house.",
+      "target": "route=R2",
+      "split": "train"
+    },
+    {
+      "id": "R2-3-2",
+      "group": "R2-3",
+      "text": "Ticket 114: My package was delivered to the wrong house.",
+      "target": "route=R2",
+      "split": "train"
+    },
+    {
+      "id": "R2-3-3",
+      "group": "R2-3",
+      "text": "Ticket 115: My package was delivered to the wrong house.",
+      "target": "route=R2",
+      "split": "train"
+    },
+    {
+      "id": "R2-4-0",
+      "group": "R2-4",
+      "text": "Ticket 116: The courier missed the scheduled delivery.",
+      "target": "route=R2",
+      "split": "train"
+    },
+    {
+      "id": "R2-4-1",
+      "group": "R2-4",
+      "text": "Ticket 117: The courier missed the scheduled delivery.",
+      "target": "route=R2",
+      "split": "train"
+    },
+    {
+      "id": "R2-4-2",
+      "group": "R2-4",
+      "text": "Ticket 118: The courier missed the scheduled delivery.",
+      "target": "route=R2",
+      "split": "train"
+    },
+    {
+      "id": "R2-4-3",
+      "group": "R2-4",
+      "text": "Ticket 119: The courier missed the scheduled delivery.",
+      "target": "route=R2",
+      "split": "train"
+    },
+    {
+      "id": "R2-5-0",
+      "group": "R2-5",
+      "text": "Ticket 120: The package is marked delivered but missing.",
+      "target": "route=R2",
+      "split": "train"
+    },
+    {
+      "id": "R2-5-1",
+      "group": "R2-5",
+      "text": "Ticket 121: The package is marked delivered but missing.",
+      "target": "route=R2",
+      "split": "train"
+    },
+    {
+      "id": "R2-5-2",
+      "group": "R2-5",
+      "text": "Ticket 122: The package is marked delivered but missing.",
+      "target": "route=R2",
+      "split": "train"
+    },
+    {
+      "id": "R2-5-3",
+      "group": "R2-5",
+      "text": "Ticket 123: The package is marked delivered but missing.",
+      "target": "route=R2",
+      "split": "train"
+    }
+  ],
+  "validation": [
+    {
+      "id": "R0-6-0",
+      "group": "R0-6",
+      "text": "Ticket 124: I was billed after cancelling the subscription.",
+      "target": "route=R0",
+      "split": "validation"
+    },
+    {
+      "id": "R0-6-1",
+      "group": "R0-6",
+      "text": "Ticket 125: I was billed after cancelling the subscription.",
+      "target": "route=R0",
+      "split": "validation"
+    },
+    {
+      "id": "R0-6-2",
+      "group": "R0-6",
+      "text": "Ticket 126: I was billed after cancelling the subscription.",
+      "target": "route=R0",
+      "split": "validation"
+    },
+    {
+      "id": "R0-6-3",
+      "group": "R0-6",
+      "text": "Ticket 127: I was billed after cancelling the subscription.",
+      "target": "route=R0",
+      "split": "validation"
+    },
+    {
+      "id": "R0-7-0",
+      "group": "R0-7",
+      "text": "Ticket 128: Please explain this extra fee.",
+      "target": "route=R0",
+      "split": "validation"
+    },
+    {
+      "id": "R0-7-1",
+      "group": "R0-7",
+      "text": "Ticket 129: Please explain this extra fee.",
+      "target": "route=R0",
+      "split": "validation"
+    },
+    {
+      "id": "R0-7-2",
+      "group": "R0-7",
+      "text": "Ticket 130: Please explain this extra fee.",
+      "target": "route=R0",
+      "split": "validation"
+    },
+    {
+      "id": "R0-7-3",
+      "group": "R0-7",
+      "text": "Ticket 131: Please explain this extra fee.",
+      "target": "route=R0",
+      "split": "validation"
+    },
+    {
+      "id": "R1-6-0",
+      "group": "R1-6",
+      "text": "Ticket 124: The sign-in page keeps sending me back.",
+      "target": "route=R1",
+      "split": "validation"
+    },
+    {
+      "id": "R1-6-1",
+      "group": "R1-6",
+      "text": "Ticket 125: The sign-in page keeps sending me back.",
+      "target": "route=R1",
+      "split": "validation"
+    },
+    {
+      "id": "R1-6-2",
+      "group": "R1-6",
+      "text": "Ticket 126: The sign-in page keeps sending me back.",
+      "target": "route=R1",
+      "split": "validation"
+    },
+    {
+      "id": "R1-6-3",
+      "group": "R1-6",
+      "text": "Ticket 127: The sign-in page keeps sending me back.",
+      "target": "route=R1",
+      "split": "validation"
+    },
+    {
+      "id": "R1-7-0",
+      "group": "R1-7",
+      "text": "Ticket 128: I lost access to the email used for login.",
+      "target": "route=R1",
+      "split": "validation"
+    },
+    {
+      "id": "R1-7-1",
+      "group": "R1-7",
+      "text": "Ticket 129: I lost access to the email used for login.",
+      "target": "route=R1",
+      "split": "validation"
+    },
+    {
+      "id": "R1-7-2",
+      "group": "R1-7",
+      "text": "Ticket 130: I lost access to the email used for login.",
+      "target": "route=R1",
+      "split": "validation"
+    },
+    {
+      "id": "R1-7-3",
+      "group": "R1-7",
+      "text": "Ticket 131: I lost access to the email used for login.",
+      "target": "route=R1",
+      "split": "validation"
+    },
+    {
+      "id": "R2-6-0",
+      "group": "R2-6",
+      "text": "Ticket 124: Can I choose another delivery date?",
+      "target": "route=R2",
+      "split": "validation"
+    },
+    {
+      "id": "R2-6-1",
+      "group": "R2-6",
+      "text": "Ticket 125: Can I choose another delivery date?",
+      "target": "route=R2",
+      "split": "validation"
+    },
+    {
+      "id": "R2-6-2",
+      "group": "R2-6",
+      "text": "Ticket 126: Can I choose another delivery date?",
+      "target": "route=R2",
+      "split": "validation"
+    },
+    {
+      "id": "R2-6-3",
+      "group": "R2-6",
+      "text": "Ticket 127: Can I choose another delivery date?",
+      "target": "route=R2",
+      "split": "validation"
+    },
+    {
+      "id": "R2-7-0",
+      "group": "R2-7",
+      "text": "Ticket 128: My shipment is stuck at the distribution center.",
+      "target": "route=R2",
+      "split": "validation"
+    },
+    {
+      "id": "R2-7-1",
+      "group": "R2-7",
+      "text": "Ticket 129: My shipment is stuck at the distribution center.",
+      "target": "route=R2",
+      "split": "validation"
+    },
+    {
+      "id": "R2-7-2",
+      "group": "R2-7",
+      "text": "Ticket 130: My shipment is stuck at the distribution center.",
+      "target": "route=R2",
+      "split": "validation"
+    },
+    {
+      "id": "R2-7-3",
+      "group": "R2-7",
+      "text": "Ticket 131: My shipment is stuck at the distribution center.",
+      "target": "route=R2",
+      "split": "validation"
+    }
+  ],
+  "test": [
+    {
+      "id": "R0-8-0",
+      "group": "R0-8",
+      "text": "Ticket 132: The receipt shows a different price from checkout.",
+      "target": "route=R0",
+      "split": "test"
+    },
+    {
+      "id": "R0-8-1",
+      "group": "R0-8",
+      "text": "Ticket 133: The receipt shows a different price from checkout.",
+      "target": "route=R0",
+      "split": "test"
+    },
+    {
+      "id": "R0-8-2",
+      "group": "R0-8",
+      "text": "Ticket 134: The receipt shows a different price from checkout.",
+      "target": "route=R0",
+      "split": "test"
+    },
+    {
+      "id": "R0-8-3",
+      "group": "R0-8",
+      "text": "Ticket 135: The receipt shows a different price from checkout.",
+      "target": "route=R0",
+      "split": "test"
+    },
+    {
+      "id": "R0-9-0",
+      "group": "R0-9",
+      "text": "Ticket 136: I want to dispute a debit on my statement.",
+      "target": "route=R0",
+      "split": "test"
+    },
+    {
+      "id": "R0-9-1",
+      "group": "R0-9",
+      "text": "Ticket 137: I want to dispute a debit on my statement.",
+      "target": "route=R0",
+      "split": "test"
+    },
+    {
+      "id": "R0-9-2",
+      "group": "R0-9",
+      "text": "Ticket 138: I want to dispute a debit on my statement.",
+      "target": "route=R0",
+      "split": "test"
+    },
+    {
+      "id": "R0-9-3",
+      "group": "R0-9",
+      "text": "Ticket 139: I want to dispute a debit on my statement.",
+      "target": "route=R0",
+      "split": "test"
+    },
+    {
+      "id": "R1-8-0",
+      "group": "R1-8",
+      "text": "Ticket 132: The service says my credentials are invalid.",
+      "target": "route=R1",
+      "split": "test"
+    },
+    {
+      "id": "R1-8-1",
+      "group": "R1-8",
+      "text": "Ticket 133: The service says my credentials are invalid.",
+      "target": "route=R1",
+      "split": "test"
+    },
+    {
+      "id": "R1-8-2",
+      "group": "R1-8",
+      "text": "Ticket 134: The service says my credentials are invalid.",
+      "target": "route=R1",
+      "split": "test"
+    },
+    {
+      "id": "R1-8-3",
+      "group": "R1-8",
+      "text": "Ticket 135: The service says my credentials are invalid.",
+      "target": "route=R1",
+      "split": "test"
+    },
+    {
+      "id": "R1-9-0",
+      "group": "R1-9",
+      "text": "Ticket 136: I cannot complete two-factor authentication.",
+      "target": "route=R1",
+      "split": "test"
+    },
+    {
+      "id": "R1-9-1",
+      "group": "R1-9",
+      "text": "Ticket 137: I cannot complete two-factor authentication.",
+      "target": "route=R1",
+      "split": "test"
+    },
+    {
+      "id": "R1-9-2",
+      "group": "R1-9",
+      "text": "Ticket 138: I cannot complete two-factor authentication.",
+      "target": "route=R1",
+      "split": "test"
+    },
+    {
+      "id": "R1-9-3",
+      "group": "R1-9",
+      "text": "Ticket 139: I cannot complete two-factor authentication.",
+      "target": "route=R1",
+      "split": "test"
+    },
+    {
+      "id": "R2-8-0",
+      "group": "R2-8",
+      "text": "Ticket 132: The carrier has sent my parcel back to the sender.",
+      "target": "route=R2",
+      "split": "test"
+    },
+    {
+      "id": "R2-8-1",
+      "group": "R2-8",
+      "text": "Ticket 133: The carrier has sent my parcel back to the sender.",
+      "target": "route=R2",
+      "split": "test"
+    },
+    {
+      "id": "R2-8-2",
+      "group": "R2-8",
+      "text": "Ticket 134: The carrier has sent my parcel back to the sender.",
+      "target": "route=R2",
+      "split": "test"
+    },
+    {
+      "id": "R2-8-3",
+      "group": "R2-8",
+      "text": "Ticket 135: The carrier has sent my parcel back to the sender.",
+      "target": "route=R2",
+      "split": "test"
+    },
+    {
+      "id": "R2-9-0",
+      "group": "R2-9",
+      "text": "Ticket 136: Where can I collect the shipment after a missed drop-off?",
+      "target": "route=R2",
+      "split": "test"
+    },
+    {
+      "id": "R2-9-1",
+      "group": "R2-9",
+      "text": "Ticket 137: Where can I collect the shipment after a missed drop-off?",
+      "target": "route=R2",
+      "split": "test"
+    },
+    {
+      "id": "R2-9-2",
+      "group": "R2-9",
+      "text": "Ticket 138: Where can I collect the shipment after a missed drop-off?",
+      "target": "route=R2",
+      "split": "test"
+    },
+    {
+      "id": "R2-9-3",
+      "group": "R2-9",
+      "text": "Ticket 139: Where can I collect the shipment after a missed drop-off?",
+      "target": "route=R2",
+      "split": "test"
+    }
+  ]
+}
