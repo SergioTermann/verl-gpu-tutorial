@@ -1,0 +1,11 @@
+{
+  "seed": 14014,
+  "steps": 200,
+  "learning_rate": 0.001,
+  "batch_size": 32,
+  "split_sha256": "a420572d5b05122834f30e0975b1fefe6b339cb9d4520a2bd597c0c0f9d3c76f",
+  "torch": "2.8.0+cu128",
+  "python": "3.12.3",
+  "device": "cuda:0",
+  "scope": "Three-digit parity; fixed-step SFT; no GRPO result implied."
+}

@@ -4,9 +4,11 @@
 
 The lessons are written in Chinese. Chinese-speaking learners can start with the [中文学习入口](README.zh-CN.md).
 
-A 12-lesson Jupyter course covering GPU basics, supervised fine-tuning, GRPO concepts, model evaluation, reproducibility, and a real single-GPU verl training run with failure diagnosis.
+A 16-lesson Jupyter course covering GPU basics, supervised fine-tuning, GRPO, reproducibility, real single-GPU verl training, failure diagnosis, gradient checks, evaluation uncertainty, and memory/throughput measurement.
 
 [Course home](tutorial/00_START_HERE.ipynb) · [Lesson index](tutorial/README.md) · [Advanced lessons](tutorial/ADVANCED.md)
+
+For a research-to-engineering learning path, see the Chinese [engineering roadmap and assessment](tutorial/ENGINEERING_ROADMAP.md). Lessons 13–16 add executable exercises and distinguish micro-model evidence from larger-model, multi-GPU, and serving work still to be validated.
 
 ## Setup
 

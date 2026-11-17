@@ -1,0 +1,20 @@
+{
+  "steps": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "nonzero_gradient_steps": 1,
+  "scope": "Fixed SFT checkpoint vs ten additional GRPO steps; one seed; no continued-SFT control.",
+  "test_accuracy": {
+    "grpo": 1.0,
+    "sft": 1.0
+  }
+}

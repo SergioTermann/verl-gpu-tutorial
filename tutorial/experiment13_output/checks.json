@@ -1,0 +1,8 @@
+{
+  "shift": true,
+  "policy_gradient": true,
+  "clipping": true,
+  "masks": true,
+  "kl_identity": true,
+  "exact_kl": 0.20077680106635198
+}

@@ -1,0 +1,12 @@
+{
+  "n": 80,
+  "delta": 1.0,
+  "paired_bootstrap_95": [
+    1.0,
+    1.0
+  ],
+  "improved": 80,
+  "worsened": 0,
+  "zero_of_20_one_sided_95_upper": 0.13910834066826516,
+  "scope": "Item uncertainty only; one training seed; approximate iid item assumption."
+}

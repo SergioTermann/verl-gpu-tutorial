@@ -1,0 +1,7 @@
+{
+  "torch": "2.8.0+cu128",
+  "cuda": "12.8",
+  "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "bf16_relative_l2": 0.005061621777713299,
+  "scope": "MLP inference microbenchmark; not serving latency or training throughput."
+}

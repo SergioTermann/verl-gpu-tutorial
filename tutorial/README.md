@@ -1,40 +1,49 @@
 # verl GPU 中文交互教程
 
-## 高级部分
+本课程共 16 课，以可编辑、可逐格运行的 Notebook 为主。课程首页为 [00_START_HERE.ipynb](00_START_HERE.ipynb)，安装方法见 [中文 README](../README.zh-CN.md)。
 
-- `12_sparse_reward_diagnosis.ipynb`：有明确含义的奇偶判断奖励，10 步真实 verl 训练及固定测试评估。随机冷启动的稀疏奖励失败案例，包含合法输出率、梯度和训练前后预测诊断；脚本在 `advanced12/`，报告在 `experiment12_output/`。
+## 基础课程
 
-- `11_real_verl_training.ipynb`：真实 Ray/vLLM/FSDP 单步 GRPO，已检查梯度、参数变化、优化器状态和检查点。随机微型模型与字节和合成奖励仅验证工程链路，不衡量任务质量。默认展示最近实测，设 `RUN_TRAINING=True` 才会新训练。
-- 配套脚本在 `advanced11/`；每轮数据与权重保存在 WSL `/opt/verl-advanced11/runs/`，最近运行路径见 `advanced11/latest_run.txt`，报告副本见 `experiment11_output/verification.json`。
-- 本机配置将奖励 worker 从默认 8 降为 1，解决首次试跑的主机内存压力。后续每个独立 run 目录均保存完整日志。
+| 课程 | 主要内容 |
+|---|---|
+| [01：GPU 与奖励学习](verl_gpu_beginner.ipynb) | 设备验证、计时与策略梯度 |
+| [02：微型语言模型](02_tiny_language_model.ipynb) | 分词、监督训练与生成 |
+| [03：组内奖励学习](03_group_reward_learning.ipynb) | 采样、优势、裁剪和 KL |
+| [04：三组训练对照](04_visible_learning_comparison.ipynb) | 冻结、继续 SFT 与奖励微调 |
+| [05：交互评估台](05_model_playground.ipynb) | 分布内外、格式与逐题错误 |
+| [06：数据覆盖](06_data_coverage.ipynb) | 分组隔离、验证与最终评估 |
+| [07：逐位推理](07_column_reasoning.ipynb) | 学习局部规则与人工算法 |
+| [08：采样与奖励漏洞](08_sampling_and_rewards.ipynb) | 温度、探索和奖励测试 |
+| [09：状态保存与恢复](09_checkpoints_and_reproducibility.ipynb) | 权重、优化器和随机状态 |
+| [10：verl 接口与基础验收](10_verl_bridge_and_graduation.ipynb) | 模型/tokenizer、Parquet 和配置 |
 
-基础课程共 10 课，统一入口：`00_START_HERE.ipynb`。启动脚本默认打开课程首页，首次按顺序学习；已经完成 01–07 时可直接运行 08–10。
+## 高级课程
 
-## 实验目录
+从第 11 课开始验证真实 verl 训练，再把失败诊断推进到梯度、预热、评估和资源测量。
 
-- `verl_gpu_beginner.ipynb`：第一课，GPU 验证与策略梯度原理。
-- `02_tiny_language_model.ipynb`：第二课，从零训练微型 Qwen2 生成加法答案，包含实时曲线、独立测试集、错误分析与模型保存。无需下载模型；这是监督训练实验，不是完整 verl RL 训练。
-- `03_group_reward_learning.ipynb`：第三课，加载第二课权重，运行教学版 GRPO 风格奖励微调；展示组采样、优势、策略裁剪、参考策略 KL、冻结基线与改善/退化题目。必须先完成第二课保存格。它是 PyTorch 教学实现，不是完整 verl 训练器运行。
-- `04_visible_learning_comparison.ipynb`：第四课，从只预热 200 步的相同模型出发，对比冻结基线、继续 SFT、奖励 RL；固定测试集，显示三组准确率和全部测试题答案。输出写入 `experiment04_output/`，保留前三课结果。这是单种子教学演示，改变了第三课的初始条件。
-- `05_model_playground.ipynb`：第五课，加载第四课的三个模型，输入数字并排比较真实 GPU 生成；评估原测试题、前导零、新数字范围和三位答案，保存全部预测与权重哈希到 `experiment05_output/`。不训练、不修改权重。运行第 5 节代码格后可使用交互按钮。
-- `06_data_coverage.ipynb`：第六课，用 0–69 数字范围和前导零格式继续 SFT；从未在先前训练或评估中出现的数对构建新验证/最终测试集，另测 70–99 外推。训练只监测验证集，固定步数后做最终评估。模型、划分和完整预测保存到 `experiment06_output/`。
-- `07_column_reasoning.ipynb`：第七课，学习全部 200 个单列数字/进位状态，再用人工编写的竖式循环组合；测试长数字与连续进位，并提供逐列交互面板。明确区分学习的局部规则与人为算法，不声称 Qwen 自己发现了加法。结果保存到 `experiment07_output/`。
-- `08_sampling_and_rewards.ipynb`：第八课，真实模型温度采样对比、人工奖励漏洞样例和严格奖励测试。
-- `09_checkpoints_and_reproducibility.ipynb`：第九课，连续训练与完整状态恢复比较，展示只恢复权重为何不能准确续训。
-- `10_verl_bridge_and_graduation.ipynb`：第十课，构建真实 tokenizer/model 包、Parquet 和奖励文件，通过 verl 数据加载器及配置检查，完成课程产物检查与理解题。不会启动完整 Ray/vLLM 训练。
+| 课程 | 核心问题 | 运行依赖 |
+|---|---|---|
+| [11：单步 GRPO](11_real_verl_training.ipynb) | 参数更新和检查点是否真实发生？ | 先运行配套脚本，或开启训练开关 |
+| [12：稀疏奖励诊断](12_sparse_reward_diagnosis.ipynb) | 流程完成后，任务为何仍失败？ | 先运行 advanced12/run.sh |
+| [13：目标函数与梯度](13_objectives_and_gradients.ipynb) | 公式、mask 与梯度是否一致？ | CPU 即可，无前课权重依赖 |
+| [14：SFT 预热与 verl](14_sft_warmup_and_verl.ipynb) | 预热能否改善协议与任务表现？ | CUDA；真实 GRPO 是单独启动的可选步骤 |
+| [15：评估不确定性](15_evaluation_and_uncertainty.ipynb) | 改善有多大，证据有多强？ | 第 14 课逐题预测，CPU 即可 |
+| [16：显存与吞吐](16_memory_and_throughput.ipynb) | 资源花在哪里，怎样正确计时？ | CUDA，无前课权重依赖 |
 
-基础教学在第十课结束；完整大模型 RL、LoRA、分布式与部署属于进阶部分。`build_foundations_final.py` 会覆盖首页和 08–10 原始教程，日常学习不要运行生成脚本。
+第 11 课使用合成奖励验证工程链路。第 12 课的历史结果是 10 步中 3 步非零梯度，贪心测试准确率未改善。第 14 课更换词表和数据范围，属于独立实验，不与第 12 课直接作同条件因果比较。
 
-第三课结果保存到 `experiment03_output/`，不覆盖第二课。重跑完整实验应从第一格重新加载起点；`build_experiment03.py` 只用于重新生成教程，会覆盖 Notebook 修改和输出。
+首次克隆后没有本地模型、日志和检查点。请先执行相应训练；公开 Notebook 已清空输出，小型 JSON/CSV 是历史运行记录。每次训练以本轮配置与输出为准。
 
-第二课结果和权重保存在 `experiment02_output/`；重跑保存格会覆盖该目录中的对应文件。`build_experiment02.py` 是教程生成脚本，日常学习无需运行，否则会覆盖 Notebook 修改和输出。
+学习要求、缺口审阅和后续 LoRA、多卡、服务项目见 [工程学习路线与考核](ENGINEERING_ROADMAP.md)。
 
-在项目目录的 PowerShell 中运行 ` .\start-notebook.ps1 `，打开终端输出的带 token 的本机链接。
+## 如何运行与保存
 
-打开 `verl_gpu_beginner.ipynb`，选择 **Python (verl GPU)** 内核，从上到下按 **Shift + Enter** 执行。保持启动终端运行，结束时按 Ctrl+C。
+在安装了 verl 的项目根目录启动 `jupyter lab --notebook-dir=tutorial`，选择 Python (verl GPU) 内核，从上到下按 Shift + Enter。交互按钮要先执行对应初始化代码。完成后关闭内核释放资源；仅关闭网页标签不一定停止计算。
 
-教程包括 GPU/FlashAttention 检查、CPU/GPU 对比、verl DataProto 和奖励、实时 GPU 策略梯度曲线、真实 verl 配置加载。小训练是 REINFORCE 原理演示，不是完整语言模型 PPO/GRPO 训练。
+第 02 课产物用于 03；第 04 课产物用于 05、06、08；第 06 课产物用于 07、10；第 09、13、16 课可独立执行。第 14 课重新初始化模型，15 使用其评估预测。先完成依赖课程的保存格，再进入下一课。
 
-运行环境：WSL Ubuntu-24.04 `/opt/verl-venv`。JupyterLab 4.6.6；安装时保留原有训练依赖版本，`uv pip check` 通过。
+结果通常写入 `experimentXX_output/`，重复保存会覆盖该目录中的报告。第 11、12、14 课的大型权重与训练日志放在独立 Linux 运行目录。公开报告用于参考，不保证不同设备或随机种子的结果一致。
 
-Notebook 保存了实测输出，重新运行即可更新。`build_notebook.py` 用于从 `lessons.py` 重新生成初始教程，会覆盖 Notebook 及其输出；日常学习直接编辑 Notebook 即可，不要运行生成脚本。
+`build_*.py` 是 Notebook 生成工具，运行会覆盖对应 Notebook 的正文与输出。日常学习直接运行 Notebook；修改课程正文时应同步对应生成脚本。
+
+03/04 是教学版 PyTorch GRPO 风格循环；07 含人工竖式算法；10 只验证接口。完整真实训练从 11 开始。16 的 MLP 微基准不能替代大模型训练或推理服务压测。

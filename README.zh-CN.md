@@ -24,6 +24,12 @@
 | [10：连接真实 verl](tutorial/10_verl_bridge_and_graduation.ipynb) | tokenizer、Parquet、奖励接口与结业检查 |
 | [11：真实单步 GRPO](tutorial/11_real_verl_training.ipynb) | Ray、vLLM、FSDP 更新与检查点 |
 | [12：稀疏奖励诊断](tutorial/12_sparse_reward_diagnosis.ipynb) | 真实任务的冷启动失败与指标分析 |
+| [13：目标函数与梯度](tutorial/13_objectives_and_gradients.ipynb) | SFT 对齐、策略梯度、裁剪、掩码与 KL |
+| [14：SFT 预热与 verl](tutorial/14_sft_warmup_and_verl.ipynb) | 修复冷启动、固定评估与真实训练接口 |
+| [15：评估不确定性](tutorial/15_evaluation_and_uncertainty.ipynb) | 配对比较、bootstrap、多种子与实验设计 |
+| [16：显存与吞吐](tutorial/16_memory_and_throughput.ipynb) | 资源预算、CUDA 计时、混合精度与瓶颈 |
+
+希望独立开展大模型工程实践，请结合[工程学习路线与考核](tutorial/ENGINEERING_ROADMAP.md)。其中明确列出了预训练模型 LoRA、多卡恢复和服务压测等尚待完成的项目。
 
 首次学习建议按顺序执行，各课之间有模型和数据依赖。Notebook 已清空运行输出，模型权重和检查点需要在本地生成；仓库中的小型 JSON/CSV 保留历史实测结果供参考。
 
