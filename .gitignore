@@ -1,0 +1,9 @@
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+*.log
+*.pt
+*.safetensors
+*.parquet
+latest_run.txt
+.env

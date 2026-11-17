@@ -1,0 +1,16 @@
+suite,model,count,accuracy,text_match,termination_rate
+Seen train,baseline,320,0.578125,0.578125,1.0
+Seen train,sft,320,1.0,1.0,1.0
+Seen train,rl,320,0.934375,0.934375,1.0
+Held-out,baseline,80,0.4375,0.4375,1.0
+Held-out,sft,80,0.7625,0.7625,1.0
+Held-out,rl,80,0.6,0.6,1.0
+Leading zeros,baseline,80,0.15,0.15,1.0
+Leading zeros,sft,80,0.275,0.275,1.0
+Leading zeros,rl,80,0.2,0.2,1.0
+New operands,baseline,100,0.0,0.0,1.0
+New operands,sft,100,0.0,0.0,1.0
+New operands,rl,100,0.0,0.0,1.0
+Three-digit sum,baseline,100,0.0,0.0,1.0
+Three-digit sum,sft,100,0.0,0.0,1.0
+Three-digit sum,rl,100,0.0,0.0,1.0

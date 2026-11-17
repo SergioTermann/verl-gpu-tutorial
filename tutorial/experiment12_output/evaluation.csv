@@ -1,0 +1,7 @@
+stage,split,count,accuracy,valid_rate
+after,test,20,0.0,0.0
+after,train,70,0.0,0.0
+after,validation,10,0.0,0.0
+before,test,20,0.0,0.0
+before,train,70,0.0,0.0
+before,validation,10,0.0,0.0

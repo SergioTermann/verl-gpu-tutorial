@@ -1,0 +1,14 @@
+{
+  "GPU experiment": true,
+  "SFT": true,
+  "RL": true,
+  "controls": true,
+  "evaluation": true,
+  "coverage": true,
+  "composition": true,
+  "reward audit": true,
+  "resume": true,
+  "tokenizer": true,
+  "parquet": true,
+  "config": true
+}

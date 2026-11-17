@@ -1,0 +1,9 @@
+{
+  "root": "/opt/verl-advanced12/runs/20261117-073127-9429",
+  "steps": 10,
+  "max_weight_change": 0.0002454519271850586,
+  "nonzero_gradient_steps": 3,
+  "memory_pressure": false,
+  "majority_test_accuracy": 0.5,
+  "note": "No test-based tuning. Random cold start with strict sparse reward; no learning improvement claimed."
+}

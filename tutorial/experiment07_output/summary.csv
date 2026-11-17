@@ -1,0 +1,12 @@
+suite,length,count,accuracy
+carry_chain,2,1,1.0
+carry_chain,4,1,1.0
+carry_chain,8,1,1.0
+carry_chain,16,1,1.0
+carry_chain,32,1,1.0
+carry_chain,64,1,1.0
+random,2,100,1.0
+random,4,100,1.0
+random,8,100,1.0
+random,16,100,1.0
+random,32,100,1.0

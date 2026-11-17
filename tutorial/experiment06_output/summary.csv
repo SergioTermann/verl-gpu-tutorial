@@ -1,0 +1,9 @@
+suite,format,model,count,accuracy
+Fresh in-range,plain,before,200,0.0
+Fresh in-range,plain,after,200,0.995
+Fresh in-range,zeros,before,200,0.0
+Fresh in-range,zeros,after,200,1.0
+Outside 70-99,plain,before,100,0.0
+Outside 70-99,plain,after,100,0.0
+Outside 70-99,zeros,before,100,0.0
+Outside 70-99,zeros,after,100,0.0
