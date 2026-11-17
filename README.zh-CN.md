@@ -70,4 +70,4 @@ bash tutorial/advanced12/run.sh
 
 ## 许可与来源
 
-采用 [Apache-2.0](LICENSE)，保留上游 [Notice](Notice.txt)。教程使用 volcengine/verl 的接口与示例，为独立教学项目，并非官方教程或上游背书。
+本项目原创教程内容与配套脚本采用 [MIT 协议](LICENSE)。上游 verl 代码及由其衍生的部分仍遵循 [Apache-2.0](LICENSE-APACHE-2.0)，来源说明见 [Notice.txt](Notice.txt)。教程使用 volcengine/verl 的接口与示例，为独立教学项目，并非官方教程或上游背书。

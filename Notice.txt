@@ -1,1 +1,10 @@
-Copyright 2023-2024 Bytedance Ltd. and/or its affiliates 
+Original tutorial content and companion scripts:
+Copyright (c) 2026 SergioTermann. Licensed under the MIT License (LICENSE).
+
+Upstream attribution retained from volcengine/verl:
+Copyright 2023-2024 Bytedance Ltd. and/or its affiliates
+
+Upstream verl code and any portions derived from it remain subject to the
+Apache License, Version 2.0 (LICENSE-APACHE-2.0). The MIT License does not
+replace third-party license terms. The verl framework is installed separately
+and is not included in this tutorial package.

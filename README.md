@@ -47,4 +47,4 @@ RTX 4060 Laptop 8GB, WSL2 Ubuntu 24.04, Python 3.12, PyTorch 2.8.0/CUDA 12.8, ve
 
 ## License and attribution
 
-Released under Apache-2.0, with the upstream `LICENSE` and `Notice.txt` retained. The companion code uses verl interfaces and examples but is an independent tutorial and is not endorsed by the upstream project.
+Original tutorial content and companion scripts are released under the [MIT License](LICENSE). Upstream verl code and any portions derived from it remain subject to [Apache-2.0](LICENSE-APACHE-2.0); see [Notice.txt](Notice.txt) for attribution. This independent tutorial uses verl interfaces and examples and is not endorsed by the upstream project.
