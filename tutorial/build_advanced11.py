@@ -4,13 +4,13 @@ ROOT=Path(__file__).resolve().parent
 cells=[]
 def md(s):cells.append(dict(cell_type='markdown',metadata={},source=s))
 def code(s):cells.append(dict(cell_type='code',metadata={},source=s,outputs=[],execution_count=None))
-md('''# 高级 11 · 真正运行 verl 的一轮 GRPO 训练
+md('''# 高级 11 · 运行 verl 单步 GRPO 训练
 
-从这一课开始进入真实 verl 工程链路：**Ray 协调 → vLLM 生成 → 自定义奖励 → 组内优势 → FSDP actor 更新 → 检查点保存**。不再用自己写的 PyTorch 循环代替 verl trainer。
+本课调用 verl trainer，完成一次完整更新：Ray 协调进程，vLLM 生成回答，奖励函数评分，GRPO 计算组内优势，FSDP actor 更新参数，最后保存检查点。
 
 本课使用约 125 万参数的随机 Qwen2、4 个合成提示，每个提示生成 2 个回答。奖励是输出 UTF-8 字节和取模后的分数，**只用于产生不同奖励以测试工程链路，不衡量回答质量，也没有正确性/泛化提升结论**。
 
-本机 8GB GPU 已实测。初始化开销大于实际更新，整次运行可能需要 1–3 分钟。先关闭其他训练内核，避免 GPU 和 WSL 主机内存争用。执行训练格前阅读开关说明。
+这套微型配置已在参考环境的 8GB GPU 上完成实测。初始化开销大于实际更新，整次运行可能需要 1 至 3 分钟。先关闭其他训练内核，避免 GPU 和 WSL 主机内存争用。执行训练格前阅读开关说明。
 
 ## 1 · 理解进程与内存
 
@@ -51,7 +51,7 @@ print('奖励函数（工程测试用途）：')
 print((scripts/'reward.py').read_text())''')
 md('''## 3 · 启动训练并实时读取日志
 
-为了打开教程就能检查已完成的实测，`RUN_TRAINING=False` 默认读取最近一轮日志，**不是新训练**。改成 True 后运行本格，会真正启动新训练；程序为每轮单独保存模型、日志和 checkpoint。
+`RUN_TRAINING=False` 时，本格读取本地最近一轮训练日志。首次克隆仓库后还没有这些日志，请先运行 `bash tutorial/advanced11/run.sh`，或将开关改为 `True` 后执行本格。训练模式会新建运行目录，分别保存模型、日志和检查点。
 
 Notebook 只显示关键事件和指标，完整原始日志仍保存。中断本格会终止本次启动的进程组；不要同时运行多个副本。超时为 10 分钟，异常退出会明确报错。不会停止用户另行启动的 Ray 作业。
 
@@ -84,7 +84,7 @@ log=(run_root/'train.log').read_text()
 for line in log.splitlines():
     if 'training/global_step:1' in line:print(line)
 print('完整日志:',run_root/'train.log')''')
-md('''## 4 · 检查证据：不能只看 loss 或退出码
+md('''## 4 · 验证更新：梯度、参数与检查点
 
 本课检查真实 FSDP 权重与初始模型的最大绝对差、发生变化的张量数量、非零梯度范数、优化器状态和保存步数。
 
@@ -109,7 +109,7 @@ md('''## 5 · 读取训练状态与下一步
 
 练习：先记录本轮配置和结果，再单独尝试 `rollout.n=4`，观察生成 token 数与资源变化。不要直接增加模型、批量和序列长度三个因素。
 
-下一课可在这条已验证的链路上引入有任务含义的奖励与固定评估，并验证训练恢复。当前实验只证明工程流程跑通，不证明训练提高了问答能力。''')
+下一课沿用这条训练链路，加入奇偶判断奖励和固定评估，诊断随机模型为什么难以开始学习。本课的参数更新验证了工程流程，回答质量则需要另行评估。''')
 code('''summary_dir=Path('experiment11_output');summary_dir.mkdir(exist_ok=True)
 (summary_dir/'verification.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
 (summary_dir/'run_script.sh').write_text((scripts/'run.sh').read_text(),encoding='utf-8')

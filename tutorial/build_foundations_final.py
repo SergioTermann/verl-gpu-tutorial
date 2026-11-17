@@ -13,9 +13,9 @@ def save(name):
 
 md('''# 第 08 课 · 采样、探索与奖励漏洞
 
-前面的 RL 依赖“生成多个答案，再给奖励”。这节把采样与打分拆开看：温度如何影响答案分布？为什么“包含正确数字”不是可靠奖励？
+前面的奖励学习先生成多个答案，再对答案评分。本课分别检查这两个环节：改变温度，观察答案分布如何变化；构造容易误判的回答，检查奖励函数是否真的符合任务要求。
 
-本课只做推理，不更新权重。加载第四课不充分训练的基线，以便观察多样性。固定 5 道题，每题每种温度采样 64 次；这些是诊断样例，不用于宣称测试性能。
+本课只做推理，不更新权重。加载第四课只预热了 200 步的基线模型，以便观察多样性。固定 5 道题，每题每种温度采样 64 次；这些是诊断样例，不用于宣称测试性能。
 
 ## 1 · 温度与采样
 
@@ -81,9 +81,9 @@ save('08_sampling_and_rewards.ipynb')
 
 md('''# 第 09 课 · 保存、恢复与可复现训练
 
-模型权重能恢复推理，却不足以准确续训。优化器动量、随机数状态和训练步数也需要保存。这节用一个小 GPU 分类器演示中断恢复，并自动比较连续训练和恢复训练的结果。
+恢复模型权重后可以继续推理；要让训练沿原来的轨迹继续，还需恢复优化器动量、随机数状态和训练步数。本课用一个小型 GPU 分类器比较连续训练与中断后恢复训练，直接检查最终参数是否一致。
 
-为了把重点放在 checkpoint 机制，本课使用合成分类数据，不代表语言模型性能。只加载本课自己创建的可信 checkpoint；Python pickle 格式不应用于不可信来源。
+checkpoint（检查点）是某个训练时刻保存的状态。为了集中观察保存与恢复机制，本课使用合成分类数据，不代表语言模型性能。只加载本课自己创建的可信 checkpoint；Python pickle 格式不应用于不可信来源。
 
 ## 1 · 连续运行、权重恢复、完整恢复三条路径
 
@@ -157,9 +157,9 @@ save('09_checkpoints_and_reproducibility.ipynb')
 
 md('''# 第 10 课 · 把基础知识接到真实 verl
 
-前面学习了 SFT、奖励、采样、GRPO 风格更新、评估与保存。这节创建实际可读取的 Hugging Face 模型/tokenizer 包、verl Parquet 数据和奖励函数，使用 **当前安装的 verl 数据加载器** 读取，再加载真实训练配置。
+前面已经分别练习了训练、评估和保存。本课把这些组件接到 verl：导出 Hugging Face 模型与 tokenizer（分词器），准备 Parquet 数据和奖励函数，再用当前安装的 verl 加载数据并检查训练配置。
 
-**本课执行数据与接口集成检查，不启动 Ray/vLLM 完整训练，也不把配置成功说成训练成功。** 模型是第六课的小字符模型，奖励纯数字答案；不具备通用聊天能力。
+本课的检查范围是文件格式、数据接口与配置解析。完整的 Ray/vLLM 训练将在第 11 课使用另一套微型模型与配置验证。 模型是第六课的小字符模型，奖励纯数字答案；不具备通用聊天能力。
 
 ## 1 · 补全可保存的字符 tokenizer
 
@@ -216,7 +216,7 @@ assert reward.compute_score('tutorial_addition','10 or 12','10')==0
 print('PASS：Parquet 导出、划分与奖励函数测试通过。')''')
 md('''## 3 · 用当前 verl 数据集类读取
 
-真正导入 `RLHFDataset` 和 `DataProto`，检查数据批次。当前安装版本把 prompt 的最终分词放在 rollout AgentLoop 中，所以 dataset 返回 `raw_prompt`，不要误以为每个版本都直接返回 token 张量。
+导入 verl 的 `RLHFDataset` 和 `DataProto`，检查数据批次。当前安装版本把 prompt 的最终分词放在 rollout AgentLoop 中，所以 dataset 返回 `raw_prompt`，不要误以为每个版本都直接返回 token 张量。
 
 还会用导出的 tokenizer 和模型做一次 GPU 生成，确认接口能连接。单次答案是否正确与接口是否可运行是两件事。''')
 code('''from verl.utils.dataset.rl_dataset import RLHFDataset,collate_fn
@@ -238,11 +238,11 @@ print('题目:',prompt,'答案:',repr(answer),'奖励:',reward.compute_score('tu
 del model;torch.cuda.empty_cache()''')
 md('''## 4 · 加载真实训练配置，但不启动训练
 
-使用 `--cfg job` 只生成配置，验证参数名能被当前 verl 接受。模板设为单 GPU、短序列、小批量，但 **8GB 下完整 vLLM/Ray/actor 联合运行是否成功仍未测试**，不能把去掉 `--cfg job` 当作已经验证的运行方案。
+使用 `--cfg job` 只生成配置，验证参数名能被当前 verl 接受。模板设为单 GPU、短序列、小批量，本课导出的模型与这份配置尚未验证完整训练，因此去掉 `--cfg job` 后仍需单独排查资源和运行问题。第 11 课提供的是另一套经过验证的微型训练配置。
 
 actor 是更新策略的模型，rollout 是生成过程，ref 是 KL 参考策略；GRPO 的组内优势不需要 PPO 那样的独立 value critic。本课不启用 actor KL，因此没有验证 ref 工作进程。
 
-接下来若开展进阶课程，应首先跑完整一小步、测显存、验证参数变化和检查点，然后才扩大任务。''')
+第 11 课会先完成一次更新，检查显存、参数变化和检查点；第 12 课再加入任务奖励与固定评估。''')
 code('''overrides=[
     'algorithm.adv_estimator=grpo',f'data.train_files={out}/train.parquet',f'data.val_files={out}/val.parquet',
     'data.train_batch_size=4','data.max_prompt_length=16','data.max_response_length=4',
@@ -284,7 +284,7 @@ md('''## 5 · 基础结业检查
 
 </details>
 
-基础课程到此完成：你已能运行 GPU 实验、理解训练信号、设计评估、保存恢复模型，并准备真实 verl 的数据与配置。完整分布式训练、LoRA、大模型部署和多 GPU 优化属于后续进阶部分。''')
+如果你已完成实验并能解释上述问题，就可以进入高级课程，进一步验证 verl 的完整训练流程。基础部分练习的 GPU 计算、训练信号、评估和状态恢复，会继续用于后面的排错。完整分布式训练、LoRA、大模型部署和多 GPU 优化属于后续进阶部分。''')
 code('''required={
     'GPU experiment':'verl_gpu_beginner.ipynb','SFT':'experiment02_output/results.json',
     'RL':'experiment03_output/results.json','controls':'experiment04_output/results.json',
@@ -301,9 +301,9 @@ save('10_verl_bridge_and_graduation.ipynb')
 
 md('''# GPU 与 verl 基础课程 · 首页
 
-本课程适配本机 WSL Python (verl GPU) 与 RTX 4060 8GB。无需下载大模型，中文解释、可编辑代码、真实运行结果都在 Notebook 中。
+本课程通过可运行的 Notebook 讲解 GPU 计算与 verl 训练。实验使用随机初始化的小模型，无需下载大模型权重。参考环境为 WSL、Python (verl GPU) 内核和 RTX 4060 8GB；其他设备的运行时间和资源占用可能不同。
 
-**使用方法：** 点击课程链接，选择 Python (verl GPU)，从上到下按 Shift+Enter。文件保存的输出是历史实测；要运行按钮须先运行对应初始化格。不要同时训练多个 Notebook；完成后用 Kernel → Shut Down Kernel 释放显存，关闭标签不一定关闭内核。
+**使用方法：** 点击课程链接，选择 Python (verl GPU)，从上到下按 Shift+Enter。仓库中的 Notebook 已清空输出，请按顺序运行以生成自己的结果；交互按钮需要先执行初始化代码。不要同时训练多个 Notebook；完成后用 Kernel → Shut Down Kernel 释放显存，关闭标签不一定关闭内核。
 
 ## 学习路线
 
@@ -320,7 +320,7 @@ md('''# GPU 与 verl 基础课程 · 首页
 | [09](09_checkpoints_and_reproducibility.ipynb) | 保存和恢复 | 权重、优化器与随机状态 |
 | [10](10_verl_bridge_and_graduation.ipynb) | 真实 verl 接口与结业 | tokenizer、Parquet、奖励、配置 |
 
-建议首次按顺序学习。已有 01–07 输出时，可以直接学习 08–10。每课通常阅读 10–25 分钟，计算时间以实际日志为准。
+建议首次按顺序学习。已有 01 至 07 输出时，可以直接学习 08 至 10。每课通常阅读 10 至 25 分钟，计算时间以实际日志为准。
 
 ## 依赖与文件
 
@@ -328,16 +328,25 @@ md('''# GPU 与 verl 基础课程 · 首页
 - 04 → 05 → 06 → 07；08 使用 04；09 独立；10 使用 06 并检查课程产物。
 - 各课输出在 `experimentXX_output/`，重跑保存格会覆盖对应课输出。
 - `build_*.py` 是作者生成脚本，不是日常学习入口，运行会覆盖对应 Notebook 的修改和输出。
-- 仅在本地访问。重新启动：项目 PowerShell 运行 ` .\\start-notebook.ps1 `，打开终端打印的链接。
+- 在 verl 项目根目录运行 `jupyter lab --notebook-dir=tutorial`，打开终端打印的本机链接。安装步骤见仓库 README。
 
 ## 常见问题
 
-缺少变量：从初始化格重跑；错误内核：选 Python (verl GPU)；显存不足：关闭其他内核；旧警告：重启内核后重跑；按钮无响应：执行面板之前的代码格。基础包已包含 ipywidgets。
+缺少变量：从初始化格重跑；错误内核：选 Python (verl GPU)；显存不足：关闭其他内核；旧警告：重启内核后重跑；按钮无响应：执行面板之前的代码格。进度条或按钮无法显示时，检查当前环境是否已安装 ipywidgets，并重启内核。
 
 ## 完成基础部分的标准
 
 你应能独立解释 SFT 与奖励学习的差别、避免训练测试泄漏、判断真实改善、复现 checkpoint 恢复，并在第 10 课通过真实数据加载和配置检查。
 
-**课程范围：** 第 03/04 课是 PyTorch 教学版 GRPO 风格实现；第 07 课是局部网络与显式竖式程序；第 10 课调用真实 verl 数据类和配置入口，但没有执行完整 Ray/vLLM 训练。完成基础课程不等同于已验证完整大模型 RL 训练。进阶阶段再做完整单步训练、显存优化和部署。
+**课程范围：** 第 03/04 课是 PyTorch 教学版 GRPO 风格实现；第 07 课是局部网络与显式竖式程序；第 10 课调用真实 verl 数据类和配置入口，但没有执行完整 Ray/vLLM 训练。完成基础课程不等同于已验证完整大模型 RL 训练。进阶阶段再做完整单步训练、显存优化和部署。''')
+md('''## 高级课程
+
+[第 12 课：真实任务的稀疏奖励诊断](12_sparse_reward_diagnosis.ipynb)：使用严格奇偶任务奖励完成 10 步真实 verl GRPO；固定 70/10/20 划分，检查合法输出、准确率和梯度。本次随机冷启动仅有 3 步出现非零梯度，最终测试准确率未提高。通过这个失败案例，学习如何定位奖励与输出协议的问题。
+
+[第 11 课：真实 verl 单步 GRPO 训练](11_real_verl_training.ipynb) 已实测 Ray → vLLM → 奖励 → FSDP 更新 → 检查点保存。
+
+使用随机微型模型与合成奖励验证工程链路，不宣称任务能力提升。默认读取本地最近一次运行；首次使用需先运行配套脚本，或在第 11 课设置 `RUN_TRAINING=True` 启动训练。
+
+后续方向：任务奖励与固定评估、真实训练恢复、资源配置及更大模型。
 ''')
 save('00_START_HERE.ipynb')
