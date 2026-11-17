@@ -1,35 +1,46 @@
-# verl GPU 中文交互教程
+# Interactive verl GPU Tutorial
 
-12 节 Jupyter 课程，涵盖 GPU 入门、SFT、GRPO 风格原理、模型评估、训练复现及真实 verl 单卡训练与失败诊断。
+A 12-lesson Jupyter course covering GPU basics, supervised fine-tuning, GRPO concepts, model evaluation, reproducibility, and a real single-GPU verl training run with failure diagnosis.
 
-[课程首页](tutorial/00_START_HERE.ipynb) · [课程目录](tutorial/README.md) · [高级课程](tutorial/ADVANCED.md)
+[Course home](tutorial/00_START_HERE.ipynb) · [Lesson index](tutorial/README.md) · [Advanced lessons](tutorial/ADVANCED.md)
 
-## 运行方式
+## Setup
 
-本仓库是独立教程资源包，不包含 verl 框架源码。以 [官方 verl v0.7.1](https://github.com/volcengine/verl/tree/v0.7.1) 为基础，先按官方说明配置 Linux/WSL2 CUDA 环境。
+This repository is a standalone tutorial package; it does not contain the verl framework source. Use it with [verl v0.7.1](https://github.com/volcengine/verl/tree/v0.7.1) and follow the official installation instructions for a Linux or WSL2 CUDA environment.
 
-1. 克隆官方 verl v0.7.1 和本教程仓库。
-2. 将本仓库的 `tutorial/` 与 `local_smoke/` 复制到官方 verl 项目根目录。
-3. 在已安装 verl 的 Python 环境安装 `jupyterlab ipykernel ipywidgets matplotlib nbclient`。
-4. 执行 `python -m ipykernel install --user --name verl-gpu --display-name "Python (verl GPU)"`。
-5. 在 verl 根目录执行 `jupyter lab --notebook-dir=tutorial`，打开 `00_START_HERE.ipynb`。
+1. Clone the official verl v0.7.1 repository and this tutorial repository.
+2. Copy this repository's `tutorial/` and `local_smoke/` directories into the root of the verl checkout.
+3. In the Python environment where verl is installed, install `jupyterlab ipykernel ipywidgets matplotlib nbclient`.
+4. Register the kernel:
 
-按顺序运行课程，模型权重、数据和 checkpoint 将在本地生成。Notebook 输出已清空，避免携带本机日志与登录信息；`experimentXX_output/` 中的小型 JSON/CSV 是历史实测记录，不是跨设备性能保证。
+   ```bash
+   python -m ipykernel install --user --name verl-gpu --display-name "Python (verl GPU)"
+   ```
 
-高级脚本基于 WSL `/opt/verl-venv`，运行前按自己的环境调整激活路径和 `/opt` 输出目录。文档中的 `/path/to/verl` 是路径占位符。高级课程默认读取本地已完成运行，首次使用须先执行 `bash tutorial/advanced11/run.sh` 或 `bash tutorial/advanced12/run.sh`，再执行对应 Notebook。
+5. From the verl root, start JupyterLab:
 
-## 结果边界
+   ```bash
+   jupyter lab --notebook-dir=tutorial
+   ```
 
-- 03/04 是教学版 PyTorch GRPO 风格循环，不等同于 verl trainer。
-- 07 使用人工竖式算法组合学习到的局部规则。
-- 11 实测完成真实 Ray/vLLM/FSDP 参数更新与 checkpoint 保存。
-- 12 实测揭示稀疏奖励冷启动失败，保留负面结果，不宣称准确率改善。
-- 训练与测试使用固定小规模数据；单次运行不代表统计显著性或通用能力。
+   Open `00_START_HERE.ipynb` and select the `Python (verl GPU)` kernel.
 
-## 参考环境
+Run the lessons in order. Model weights, datasets, and checkpoints are generated locally. Notebook outputs in this repository have been cleared to avoid shipping machine-specific logs or credentials. Small JSON/CSV files under `experimentXX_output/` are recorded measurements from the reference environment, not cross-device performance guarantees.
 
-RTX 4060 Laptop 8GB、WSL2 Ubuntu 24.04、Python 3.12、PyTorch 2.8.0/CUDA 12.8、verl 0.7.1、vLLM 0.11.0、transformers 4.57.1。安装应遵循官方版本兼容要求。
+The advanced scripts were developed in WSL with `/opt/verl-venv`; adjust the activation path and output directories for your environment. `/path/to/verl` in the documentation is a placeholder. Before opening the advanced notebooks for the first time, run `bash tutorial/advanced11/run.sh` or `bash tutorial/advanced12/run.sh` as appropriate.
 
-## 许可与来源
+## Scope and limitations
 
-以 Apache-2.0 发布，保留 LICENSE 与上游 Notice。教程配套代码基于 volcengine/verl 的接口与示例，不是官方教程，也不代表上游项目背书。
+- Lessons 03 and 04 use an educational PyTorch GRPO-style loop; they are not equivalent to the verl trainer.
+- Lesson 07 combines a learned local digit rule with a hand-written column-addition algorithm.
+- Lesson 11 verifies a real Ray/vLLM/FSDP parameter update and checkpoint save.
+- Lesson 12 records a sparse-reward cold-start failure and makes no accuracy-improvement claim.
+- The experiments use small fixed datasets and single runs; they do not establish statistical significance or general capability.
+
+## Reference environment
+
+RTX 4060 Laptop 8GB, WSL2 Ubuntu 24.04, Python 3.12, PyTorch 2.8.0/CUDA 12.8, verl 0.7.1, vLLM 0.11.0, and transformers 4.57.1. Follow the official compatibility guidance when installing dependencies.
+
+## License and attribution
+
+Released under Apache-2.0, with the upstream `LICENSE` and `Notice.txt` retained. The companion code uses verl interfaces and examples but is an independent tutorial and is not endorsed by the upstream project.
