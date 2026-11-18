@@ -12,6 +12,7 @@ slime 的核心是 Megatron 训练、SGLang rollout、Ray 资源编排和数据�
 - [S03：分离调试与验收](03_debugging_and_run_contract.ipynb)
 - [后续路线](ROADMAP.md)
 - [验证记录](VALIDATION.md)
+- [SGLang GPU 修复与本机启动](sglang_local/README.md)
 
 S01 至 S03 只进行源码、接口和 CPU 夹具测试，不启动完整 Megatron/SGLang 训练。完整训练需要官方兼容的 Linux GPU 环境；官方快速入门当前主要覆盖 H100/H200，不能把本机 RTX 4060 的导入成功解释成训练可行。
 

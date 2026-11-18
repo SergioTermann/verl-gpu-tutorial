@@ -10,6 +10,8 @@
 
 ## 当前环境限制
 
+后续更新：已在 `/opt/sglang-venv` 完成 SGLang 0.5.3.post3 的 GPU Engine 文本生成。此前 SM89 不兼容的判断已纠正，实际首个阻断是缺少 libnuma。修复过程、依赖覆盖方式和可重跑脚本见 [SGLang 本机说明](sglang_local/README.md)。该结果不等于完整 slime/Megatron 训练通过。下文记录前三课最初验证时的环境状态。
+
 本机 verl 环境没有安装 SGLang，硬件也不是官方 GPU CI 主要覆盖的 H100/H200。课程因此没有伪造端到端训练结果。要继续，需要按上游 Quick Start 使用匹配的 Docker 或 conda 环境，并记录镜像 digest、驱动、CUDA、Megatron、SGLang、Ray 与模型 revision。
 
 课程执行会检查上游 checkout 的 commit。Windows checkout 在 WSL 中可能显示换行差异，代码只忽略 line-ending 差异，仍会拒绝有实际内容的本地修改。第三方源码不复制进本仓库。
