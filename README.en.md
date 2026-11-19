@@ -1,6 +1,18 @@
-# Interactive verl GPU Tutorial
+<p align="center">
+  <a href="tutorial/00_课程导航.ipynb"><img src="tutorial/support/assets/logo.png" width="64" height="64" alt="SergioTermann"></a>
+</p>
 
-**English** | [简体中文](README.md)
+<h1 align="center">Interactive verl GPU Tutorial</h1>
+
+<p align="center">
+  <strong>English</strong> · <a href="README.md">简体中文</a>
+</p>
+
+<p align="center">
+  <a href="tutorial/support/docs/README.md"><img src="tutorial/support/assets/labs-en.png" width="89" height="22" alt="verl labs · 18"></a>
+  <a href="tutorial/00_课程导航.ipynb"><img src="tutorial/support/assets/jupyter.png" width="128" height="22" alt="Jupyter Notebook"></a>
+  <a href="LICENSE"><img src="tutorial/support/assets/license-en.png" width="92" height="22" alt="License · MIT"></a>
+</p>
 
 The notebooks are written in Simplified Chinese.
 

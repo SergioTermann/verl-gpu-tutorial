@@ -1,6 +1,18 @@
-# verl GPU 中文交互教程
+<p align="center">
+  <a href="tutorial/00_课程导航.ipynb"><img src="tutorial/support/assets/logo.png" width="64" height="64" alt="SergioTermann"></a>
+</p>
 
-**简体中文** · [English](README.en.md)
+<h1 align="center">verl GPU 中文交互教程</h1>
+
+<p align="center">
+  <strong>简体中文</strong> · <a href="README.en.md">English</a>
+</p>
+
+<p align="center">
+  <a href="tutorial/support/docs/README.md"><img src="tutorial/support/assets/labs-zh.png" width="90" height="22" alt="verl 实验 · 18"></a>
+  <a href="tutorial/00_课程导航.ipynb"><img src="tutorial/support/assets/jupyter.png" width="128" height="22" alt="Jupyter Notebook"></a>
+  <a href="LICENSE"><img src="tutorial/support/assets/license-zh.png" width="86" height="22" alt="许可证 · MIT"></a>
+</p>
 
 通过 Jupyter Notebook 逐格运行代码，学习 GPU 计算、监督微调、奖励学习、评估、复现和真实 verl 单卡训练。
 
