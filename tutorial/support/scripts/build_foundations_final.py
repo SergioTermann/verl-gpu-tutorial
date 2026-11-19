@@ -7,11 +7,17 @@ cells=[]
 def md(s):cells.append(dict(cell_type='markdown',metadata={},source=s))
 def code(s):cells.append(dict(cell_type='code',metadata={},source=s,outputs=[],execution_count=None))
 def save(name):
+    md('''---
+
+<a href="https://github.com/SergioTermann"><img src="support/assets/logo.png" alt="SergioTermann" width="44" height="44" align="left" style="margin: 0 12px 0 0;"></a>
+
+**更多有趣的 AI 课程**  
+[← 访问 SergioTermann 的 GitHub 主页](https://github.com/SergioTermann)''')
     for i,c in enumerate(cells):c['id']=f'cell-{i:02d}'
     (ROOT/name).write_text(json.dumps(dict(nbformat=4,nbformat_minor=5,metadata=metadata,cells=cells),ensure_ascii=False,indent=2),encoding='utf-8')
     cells.clear()
 
-md('''# 第 08 课 · 采样、探索与奖励漏洞
+md('''# 实验 08 · 采样温度与奖励漏洞
 
 前面的奖励学习先生成多个答案，再对答案评分。本课分别检查这两个环节：改变温度，观察答案分布如何变化；构造容易误判的回答，检查奖励函数是否真的符合任务要求。
 
@@ -36,6 +42,7 @@ def sample(a,b,temperature,count=64):
     prompt=f'{a}+{b}='
     x=torch.tensor([[stoi[c] for c in prompt]],device='cuda').repeat(count,1)
     for _ in range(4):
+        # 取序列最后一个位置的预测分数，再除以温度。温度越低，高分候选越集中；后面的采样仍可能抽到不同答案。
         logits=model(input_ids=x,use_cache=False).logits[:,-1]/temperature
         token=torch.distributions.Categorical(logits=logits).sample()
         x=torch.cat([x,token[:,None]],dim=1)
@@ -60,7 +67,8 @@ md('''## 2 · 奖励漏洞：得分高不等于回答好
 若奖励只检查回答中是否出现目标字符串，`120`、`12 或 99` 甚至列举所有数字都可能被误判为正确。这是奖励函数设计问题，不代表模型能力提升。
 
 下面是人工构造的攻击样例，**不是声称训练模型自动发现了漏洞**。本教程的纯数字任务要求规范整数字符串；如果将来允许自然语言解释，应重新定义输出协议与解析规则，不能直接照搬严格匹配。''')
-code('''def loose_reward(answer,target):return float(str(target) in answer)
+code('''# 对照输入“120”和目标“12”：子串判断会给分，严格相等才能排除这种误奖。
+def loose_reward(answer,target):return float(str(target) in answer)
 def strict_reward(answer,target):return float(answer.strip()==str(target))
 cases=[('12',1),('120',0),('答案是 12 或 99',0),('012',0),('',0),(' 12 ',1),(' '.join(map(str,range(200))),0)]
 audit=pd.DataFrame([dict(answer=s if len(s)<50 else s[:50]+'…',expected=e,loose=loose_reward(s,12),strict=strict_reward(s,12)) for s,e in cases])
@@ -77,9 +85,9 @@ GRPO 的组大小、温度和奖励函数共同影响有效学习信号。只增
 练习：为 `-12`、`12.0`、多行文本、空白字符各写一个测试，并先说明是否应该接受。用业务目标定义预期，再实现奖励。
 
 这节结果只涵盖固定诊断题；若要比较解码策略，应预先规定完整评估集、随机种子和采样预算。''')
-save('08_sampling_and_rewards.ipynb')
+save('08_采样温度与奖励漏洞.ipynb')
 
-md('''# 第 09 课 · 保存、恢复与可复现训练
+md('''# 实验 09 · 保存检查点与恢复训练
 
 恢复模型权重后可以继续推理；要让训练沿原来的轨迹继续，还需恢复优化器动量、随机数状态和训练步数。本课用一个小型 GPU 分类器比较连续训练与中断后恢复训练，直接检查最终参数是否一致。
 
@@ -147,15 +155,16 @@ md('''## 2 · 推理模式、显存与复现边界
 把 dropout 从 0.2 改成 0.5，从头执行；再在独立副本中故意不恢复随机状态，观察差异。恢复训练前检查权重、优化器、随机状态和当前步数是否配套。
 
 Notebook 中“重跑训练格”通常意味着继续训练；要复现同一起点，应重启内核并按顺序运行。''')
-code('''restored.eval()
+code('''# 切换到评估模式后再比较恢复结果。需要接着训练时，还要恢复优化器与随机状态，它们会影响下一步更新。
+restored.eval()
 with torch.inference_mode():
     accuracy=(restored(data).argmax(-1)==labels).float().mean().item()
 print(f'合成训练数据准确率: {accuracy:.1%}（不是独立测试）')
 print(f'当前 PyTorch 已分配显存: {torch.cuda.memory_allocated()/2**20:.1f} MiB')
 print('PASS：完整 checkpoint 恢复验证通过。')''')
-save('09_checkpoints_and_reproducibility.ipynb')
+save('09_保存检查点与恢复训练.ipynb')
 
-md('''# 第 10 课 · 把基础知识接到真实 verl
+md('''# 实验 10 · 将数据和模型接入 verl
 
 前面已经分别练习了训练、评估和保存。本课把这些组件接到 verl：导出 Hugging Face 模型与 tokenizer（分词器），准备 Parquet 数据和奖励函数，再用当前安装的 verl 加载数据并检查训练配置。
 
@@ -177,6 +186,7 @@ record=json.loads((source/'results.json').read_text())
 vocab=record['vocab']
 out=Path('support/experiment10_output').resolve();out.mkdir(exist_ok=True)
 model_dir=out/'model'
+# 模型的嵌入表用整数取行。沿用第 06 课的字符编号，才能让同一字符在导出、重载后仍取到同一行权重。
 mapping={c:i for i,c in enumerate(vocab)};mapping['[UNK]']=len(mapping)
 raw=Tokenizer(models.WordLevel(mapping,unk_token='[UNK]'))
 raw.pre_tokenizer=pre_tokenizers.Split(pattern='',behavior='isolated')
@@ -199,13 +209,16 @@ md('''## 2 · 创建真实 Parquet 与奖励函数
 使用第六课训练数对的前 32 题和验证数对的前 8 题作为接口检查样本，不使用最终测试题。每行包含 `prompt` 消息列表、`data_source` 和 `reward_model.ground_truth`。
 
 奖励函数接受 verl 的调用参数。它只能读取正确答案用于评分，不能在生成提示中泄漏答案。这里是严格数字协议，输出两种候选答案或解释文本均不得分。''')
-code('''def make_rows(pairs):
+code('''# 一行 Parquet 对应一道题。prompt 是消息列表，进入模型上下文；reward_model.ground_truth 单独留给评分函数。
+# 例如 (3,7) 的消息内容是“3+7=”，参考答案是字符串“10”。extra_info.index 用于追踪样本。
+def make_rows(pairs):
     return [dict(data_source='tutorial_addition',prompt=[dict(role='user',content=f'{a}+{b}=')],
                  reward_model=dict(style='rule',ground_truth=str(a+b)),extra_info=dict(index=i)) for i,(a,b) in enumerate(pairs)]
 train=record['train_pairs'][:32];validation=record['val_pairs'][:8]
 assert not {tuple(sorted(p)) for p in train}&{tuple(sorted(p)) for p in validation}
 pd.DataFrame(make_rows(train)).to_parquet(out/'train.parquet')
 pd.DataFrame(make_rows(validation)).to_parquet(out/'val.parquet')
+# 这里生成供 verl 动态加载的 Python 文件。solution_str 是解码后的回答，ground_truth 来自数据行；返回的浮点数就是该回答的奖励。
 reward_source=chr(10).join(['def compute_score(data_source, solution_str, ground_truth, extra_info=None):','    return float(solution_str.strip() == str(ground_truth))',''])
 (out/'reward.py').write_text(reward_source,encoding='utf-8')
 spec=importlib.util.spec_from_file_location('tutorial_reward',out/'reward.py')
@@ -221,17 +234,23 @@ md('''## 3 · 用当前 verl 数据集类读取
 还会用导出的 tokenizer 和模型做一次 GPU 生成，确认接口能连接。单次答案是否正确与接口是否可运行是两件事。''')
 code('''from verl.utils.dataset.rl_dataset import RLHFDataset,collate_fn
 from verl import DataProto
+# OmegaConf 把这些键值组成配置对象。max_prompt_length 按 token 计；开启过滤后，超长提示可能让数据集行数变少。
 cfg=OmegaConf.create(dict(max_prompt_length=32,filter_overlong_prompts=True,filter_overlong_prompts_workers=1,cache_dir=str(out/'cache')))
+# 传入文件路径、刚重载的 tokenizer 和读取配置。dataset[i] 取一条经过 verl 数据接口处理的记录。
 dataset=RLHFDataset(str(out/'train.parquet'),loaded,cfg)
+# 先取 4 条记录，collate_fn 按字段把它们合并；from_single_dict 再把批量字段封装成 verl 的 DataProto。
+# len(dataset) 数整份数据集的题，len(batch) 数这次取出的题。这里预期分别是 32 和 4。
 batch=DataProto.from_single_dict(collate_fn([dataset[i] for i in range(4)]))
 assert len(dataset)==32 and len(batch)==4
 print('真实 verl 数据批次:',len(batch),'条；字段:',list(dataset[0]))
 prompt=dataset[0]['raw_prompt']
+# 先按模板把消息转成模型输入，再返回 PyTorch 张量。tokenize=True 表示返回 token ID，cuda() 把张量移到 GPU。
 tokens=loaded.apply_chat_template(prompt,tokenize=True,add_generation_prompt=True,return_tensors='pt').cuda()
 model=model.cuda().eval()
 with torch.inference_mode():
     response=model.generate(tokens,attention_mask=torch.ones_like(tokens),max_new_tokens=4,do_sample=False,
         pad_token_id=loaded.pad_token_id,eos_token_id=loaded.eos_token_id)
+# generate 返回提示和新生成的 token。切掉前 tokens.shape[1] 个位置后，评分函数才只看到模型的回答。
 answer=loaded.decode(response[0,tokens.shape[1]:],skip_special_tokens=True)
 truth=dataset[0]['reward_model']['ground_truth']
 print('题目:',prompt,'答案:',repr(answer),'奖励:',reward.compute_score('tutorial_addition',answer,truth))
@@ -243,15 +262,25 @@ md('''## 4 · 加载真实训练配置，但不启动训练
 actor 是更新策略的模型，rollout 是生成过程，ref 是 KL 参考策略；GRPO 的组内优势不需要 PPO 那样的独立 value critic。本课不启用 actor KL，因此没有验证 ref 工作进程。
 
 第 11 课会先完成一次更新，检查显存、参数变化和检查点；第 12 课再加入任务奖励与固定评估。''')
-code('''overrides=[
+code('''# 每个字符串都是一项 Hydra 配置覆盖，格式为“配置路径=值”。先读左侧模块名，再读右侧取值。
+overrides=[
+    # algorithm 选优势估计方法。GRPO 用同题多个回答的奖励作比较；train_files、val_files 分别指向训练与验证题。
     'algorithm.adv_estimator=grpo',f'data.train_files={out}/train.parquet',f'data.val_files={out}/val.parquet',
+    # 一个训练批取 4 道提示。提示长度和回答长度分别限制，单位都是 token。
     'data.train_batch_size=4','data.max_prompt_length=16','data.max_response_length=4',
+    # model.path 是模型和 tokenizer 的来源。actor 是接受更新的策略，rollout 是负责生成候选的组件，这里交给 vLLM。
     f'actor_rollout_ref.model.path={model_dir}','actor_rollout_ref.rollout.name=vllm',
+    # 张量并行度 1 表示一次推理使用一个分片。n=4 表示每道提示生成 4 个候选；4 道提示对应 16 条回答。
     'actor_rollout_ref.rollout.tensor_model_parallel_size=1','actor_rollout_ref.rollout.n=4',
+    # 推理引擎的 max_model_len 约束提示与回答的总长度。gpu_memory_utilization 是 vLLM 的显存预算比例。
     'actor_rollout_ref.rollout.max_model_len=32','actor_rollout_ref.rollout.gpu_memory_utilization=0.2',
+    # mini-batch 决定策略更新时如何分组；micro-batch 是每张卡一次前向和反向处理的更小分块，用来控制峰值显存。
     'actor_rollout_ref.actor.ppo_mini_batch_size=4','actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=1',
+    # false 关闭 actor 损失中的参考策略 KL 项。后面两项声明训练资源：每个节点一张 GPU，共一个节点。
     'actor_rollout_ref.actor.use_kl_loss=false','trainer.n_gpus_per_node=1','trainer.nnodes=1',
+    # 若实际启动训练，步数上限是 1，日志写到控制台。本格下面使用 --cfg job，只检查配置能否成功组合。
     'trainer.total_training_steps=1','trainer.logger=[console]',
+    # path 告诉 verl 去哪里找评分代码；name 指定该文件中要调用的函数。任一名称写错，都可能在实际加载时失败。
     f'custom_reward_function.path={out}/reward.py','custom_reward_function.name=compute_score']
 command=[sys.executable,'-m','verl.trainer.main_ppo','--cfg','job']+overrides
 result=subprocess.run(command,text=True,capture_output=True,timeout=120)
@@ -286,7 +315,7 @@ md('''## 5 · 基础结业检查
 
 如果你已完成实验并能解释上述问题，就可以进入高级课程，进一步验证 verl 的完整训练流程。基础部分练习的 GPU 计算、训练信号、评估和状态恢复，会继续用于后面的排错。完整分布式训练、LoRA、大模型部署和多 GPU 优化属于后续进阶部分。''')
 code('''required={
-    'GPU experiment':'01_verl_gpu_beginner.ipynb','SFT':'support/experiment02_output/results.json',
+    'GPU experiment':'01_从GPU到verl的第一步.ipynb','SFT':'support/experiment02_output/results.json',
     'RL':'support/experiment03_output/results.json','controls':'support/experiment04_output/results.json',
     'evaluation':'support/experiment05_output/evaluation.json','coverage':'support/experiment06_output/results.json',
     'composition':'support/experiment07_output/results.json','reward audit':'support/experiment08_output/reward_audit.csv',
@@ -297,28 +326,40 @@ display(pd.DataFrame(checks.items(),columns=['artifact_or_check','passed']))
 (out/'foundation_checks.json').write_text(json.dumps(checks,indent=2),encoding='utf-8')
 assert all(checks.values()),'有前置课程产物缺失，请先完成对应课程'
 print('基础实验产物与本课接口检查全部通过；理解题请自行作答。')''')
-save('10_verl_bridge_and_graduation.ipynb')
+save('10_将数据和模型接入verl.ipynb')
 
-md('''# GPU 与 verl 基础课程 · 首页
+md('''# verl 中文课程导航
 
 本课程通过可运行的 Notebook 讲解 GPU 计算与 verl 训练。实验使用随机初始化的小模型，无需下载大模型权重。参考环境为 WSL、Python (verl GPU) 内核和 RTX 4060 8GB；其他设备的运行时间和资源占用可能不同。
 
 **使用方法：** 点击课程链接，选择 Python (verl GPU)，从上到下按 Shift+Enter。仓库中的 Notebook 已清空输出，请按顺序运行以生成自己的结果；交互按钮需要先执行初始化代码。不要同时训练多个 Notebook；完成后用 Kernel → Shut Down Kernel 释放显存，关闭标签不一定关闭内核。
 
+## 第一次碰到 verl 代码时怎么读
+
+以实验 01 的这三行写法为例，先认出是谁在解释它，再预测它会产生什么：
+
+| 你看到的写法 | 谁来解释 | 读完后试着回答 |
+|---|---|---|
+| `from verl import DataProto` | Python 从 verl 包导入批数据容器 | 这里只有导入。下一行传入两行 token ID，`len(batch)` 会是多少？ |
+| `python -m verl.trainer.main_ppo --cfg job` | Python 找到模块，Hydra 读取配置 | 加上 `--cfg job` 后，输出应是配置树。去树里找 `algorithm` 这一层。 |
+| `actor_rollout_ref.rollout.n=2` | Hydra 用右侧的值覆盖左侧配置项 | 从右往左读：`n` 是每题生成几条回答，`rollout` 是生成阶段。如果一批有 4 道题，共生成几条？ |
+
+第三行的答案是 8 条，但 GRPO 比较的是 **4 个各含 2 条回答的小组**。给同一道题的两个回答都打 1 分，平均奖励是 1，组内优势却都是 0。实验 01 可以看到优势的正负号，实验 11 可以对照真实训练配置，实验 12 可以对照奖励和梯度曲线。
+
 ## 学习路线
 
 | 课次 | 内容 | 学会什么 |
 |---|---|---|
-| [01](01_verl_gpu_beginner.ipynb) | GPU 与奖励学习入门 | 设备、计时、梯度、奖励 |
-| [02](02_tiny_language_model.ipynb) | 微型 Qwen2 SFT | token、标签、生成、评估 |
-| [03](03_group_reward_learning.ipynb) | GRPO 风格教学循环 | 组采样、优势、裁剪、KL |
-| [04](04_visible_learning_comparison.ipynb) | 三组对照 | 冻结/SFT/RL、公平比较的边界 |
-| [05](05_model_playground.ipynb) | 交互评估台 | 分布变化与能力边界 |
-| [06](06_data_coverage.ipynb) | 数据覆盖 | 分组隔离、验证与最终测试 |
-| [07](07_column_reasoning.ipynb) | 逐位组合 | 人工算法先验与组合泛化 |
-| [08](08_sampling_and_rewards.ipynb) | 采样和奖励漏洞 | 探索、多样性、奖励测试 |
-| [09](09_checkpoints_and_reproducibility.ipynb) | 保存和恢复 | 权重、优化器与随机状态 |
-| [10](10_verl_bridge_and_graduation.ipynb) | 真实 verl 接口与结业 | tokenizer、Parquet、奖励、配置 |
+| [01](01_从GPU到verl的第一步.ipynb) | GPU 与奖励学习入门 | 设备、计时、梯度、奖励 |
+| [02](02_训练微型语言模型.ipynb) | 微型 Qwen2 SFT | token、标签、生成、评估 |
+| [03](03_用组内奖励微调语言模型.ipynb) | GRPO 风格教学循环 | 组采样、优势、裁剪、KL |
+| [04](04_对比冻结模型、监督训练与奖励微调.ipynb) | 三组对照 | 冻结/SFT/RL、公平比较的边界 |
+| [05](05_用交互评估台检验模型.ipynb) | 交互评估台 | 分布变化与能力边界 |
+| [06](06_用数据覆盖改善泛化.ipynb) | 数据覆盖 | 分组隔离、验证与最终测试 |
+| [07](07_逐位推理与长整数加法.ipynb) | 逐位组合 | 人工算法先验与组合泛化 |
+| [08](08_采样温度与奖励漏洞.ipynb) | 采样和奖励漏洞 | 探索、多样性、奖励测试 |
+| [09](09_保存检查点与恢复训练.ipynb) | 保存和恢复 | 权重、优化器与随机状态 |
+| [10](10_将数据和模型接入verl.ipynb) | 真实 verl 接口与结业 | tokenizer、Parquet、奖励、配置 |
 
 建议首次按顺序学习。已有 01 至 07 输出时，可以直接学习 08 至 10。每课通常阅读 10 至 25 分钟，计算时间以实际日志为准。
 
@@ -345,14 +386,14 @@ md('''## 高级课程
 
 | 课程 | 核心问题 | 运行依赖 |
 |---|---|---|
-| [11：单步 GRPO](11_real_verl_training.ipynb) | 参数更新和检查点是否真实发生？ | 先运行配套脚本，或开启训练开关 |
-| [12：稀疏奖励诊断](12_sparse_reward_diagnosis.ipynb) | 流程完成后，任务为何仍失败？ | 先运行 support/advanced12/run.sh |
-| [13：目标函数与梯度](13_objectives_and_gradients.ipynb) | 公式、mask 与梯度是否一致？ | CPU 即可，无前课权重依赖 |
-| [14：SFT 预热与 verl](14_sft_warmup_and_verl.ipynb) | 预热能否改善协议与任务表现？ | CUDA；真实 GRPO 是单独启动的可选步骤 |
-| [15：评估不确定性](15_evaluation_and_uncertainty.ipynb) | 改善有多大，证据有多强？ | 第 14 课逐题预测，CPU 即可 |
-| [16：显存与吞吐](16_memory_and_throughput.ipynb) | 资源花在哪里，怎样正确计时？ | CUDA，无前课权重依赖 |
-| [17：预训练模型 LoRA](17_pretrained_lora.ipynb) | 模板、掩码、适配器重载与合并是否可靠？ | CUDA、PEFT；首次下载约 1GB 权重 |
-| [18：本地流式服务](18_streaming_service_benchmark.ipynb) | 服务输出与并发指标是否可信？ | 第 17 课合并模型、vLLM；仅监听本机 |
+| [11：单步 GRPO](11_运行单步GRPO训练.ipynb) | 参数更新和检查点是否真实发生？ | 先运行配套脚本，或开启训练开关 |
+| [12：稀疏奖励诊断](12_诊断稀疏奖励.ipynb) | 流程完成后，任务为何仍失败？ | 先运行 support/advanced12/run.sh |
+| [13：目标函数与梯度](13_从目标函数推导策略梯度.ipynb) | 公式、mask 与梯度是否一致？ | CPU 即可，无前课权重依赖 |
+| [14：SFT 预热与 verl](14_用监督微调预热GRPO.ipynb) | 预热能否改善协议与任务表现？ | CUDA；真实 GRPO 是单独启动的可选步骤 |
+| [15：评估不确定性](15_估计评估结果的不确定性.ipynb) | 改善有多大，证据有多强？ | 第 14 课逐题预测，CPU 即可 |
+| [16：显存与吞吐](16_测量显存与训练吞吐.ipynb) | 资源花在哪里，怎样正确计时？ | CUDA，无前课权重依赖 |
+| [17：预训练模型 LoRA](17_用LoRA微调和导出预训练模型.ipynb) | 模板、掩码、适配器重载与合并是否可靠？ | CUDA、PEFT；首次下载约 1GB 权重 |
+| [18：本地流式服务](18_测试流式推理服务与并发性能.ipynb) | 服务输出与并发指标是否可信？ | 第 17 课合并模型、vLLM；仅监听本机 |
 
 第 11 课使用合成奖励验证工程链路。第 12 课的历史结果是 10 步中 3 步非零梯度，贪心测试准确率未改善。第 14 课更换词表和数据范围，属于独立实验，不与第 12 课直接作同条件因果比较。
 
@@ -360,4 +401,4 @@ md('''## 高级课程
 
 学习要求、缺口审阅和后续全量微调对照、多卡及生产负载项目见 [工程学习路线与考核](support/docs/ENGINEERING_ROADMAP.md)。
 ''')
-save('00_START_HERE.ipynb')
+save('00_课程导航.ipynb')

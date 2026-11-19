@@ -13,7 +13,7 @@ def code(s):
     cells.append(dict(cell_type='code', metadata={}, source=s, outputs=[], execution_count=None))
 
 
-md('''# 实验 03 · 用奖励微调小语言模型
+md('''# 实验 03 · 用组内奖励微调语言模型
 
 第二课直接用标准答案训练模型，这称为监督微调（SFT）。本课加载保存的微型 Qwen2，让它先采样多个答案，再根据奖励比较同题回答的优劣，用这个相对差异更新模型。
 
@@ -70,6 +70,7 @@ def decode(tokens):
     return ''.join(vocab[t] for t in tokens).split('#')[0]
 
 @torch.no_grad()
+# rollout 指用当前策略为同一提示生成候选。保留采样时的概率和有效位置，稍后更新策略时还要用到它们。
 def rollout(model, pairs, group=1, sample=True):
     prompts = [encode(f'{a}+{b}=') for a,b in pairs]
     assert len({len(p) for p in prompts}) == 1
@@ -167,10 +168,13 @@ for step in range(1,STEPS+1):
         ref_logp = response_logps(reference,x,prompt_len)
     for _ in range(UPDATES):
         logp = response_logps(actor,x,prompt_len)
+        # 同一个已采样 token，用当前和采样时的策略各算一次 log 概率。差值取 exp 后就是概率比；1 表示两者相同。
         ratio = (logp-old_logp).exp()
+        # 分别按原比率和裁剪后的比率算收益，取较小者。正优势鼓励提高概率，裁剪限制继续放大这部分收益。
         policy = -torch.minimum(ratio*adv,ratio.clamp(1-CLIP,1+CLIP)*adv)
         delta = ref_logp-logp
         kl = delta.exp()-delta-1
+        # mask 只让有效回答位置参与平均。先对每条回答求平均再对批次平均，长回答不会只因 token 多就占更大权重。
         loss = (((policy+BETA*kl)*mask).sum(1)/mask.sum(1)).mean()
         assert torch.isfinite(loss), '损失出现非有限值'
         optimizer.zero_grad(set_to_none=True)
@@ -205,6 +209,7 @@ for step in range(1,STEPS+1):
         live.update(fig)
         plt.close(fig)
         print(f"step {step:3d} | reward {row['reward']:.3f} | active {row['active']:.1%} | test {test_acc:.2%} | KL {row['kl']:.4f}",flush=True)
+# CUDA 调用可以提前把控制权还给 Python；同步会等已提交的 GPU 工作完成，再读时钟才有意义。
 torch.cuda.synchronize()
 elapsed=time.perf_counter()-start
 print(f'训练完成，用时 {elapsed:.1f} 秒。')''')
@@ -223,6 +228,7 @@ print(f'改善 {len(improved)} 题；退化 {len(regressed)} 题；测试集共 
 for name,rows in [('改善',improved),('退化',regressed)]:
     for (a,b),before,after in rows[:10]:
         print(f'{name}: {a}+{b}，{before!r} → {after!r}，正确答案 {a+b}')
+# 逐张量对比冻结参考模型与起始快照。再看 actor 是否改变，可区分参考模型和实际接受梯度更新的策略。
 assert all(torch.equal(initial_state[k],v.detach().cpu()) for k,v in reference.state_dict().items())
 assert any(not torch.equal(initial_state[k],v.detach().cpu()) for k,v in actor.state_dict().items())
 assert all(p.grad is None for p in reference.parameters())
@@ -263,8 +269,14 @@ md('''## 7 · 练习：观察约束与奖励信号
 不要反复按这 80 道测试题的成绩挑选配置后仍声称是独立最终评估。如果要比较方法，应预先定义验证集和新的最终测试集，并运行多个种子。
 
 参考：[verl GRPO 示例](https://verl.readthedocs.io/en/latest/examples/grpo_example.html)、[DeepSeekMath](https://arxiv.org/abs/2402.03300)。''')
+md('''---
+
+<a href="https://github.com/SergioTermann"><img src="support/assets/logo.png" alt="SergioTermann" width="44" height="44" align="left" style="margin: 0 12px 0 0;"></a>
+
+**更多有趣的 AI 课程**  
+[← 访问 SergioTermann 的 GitHub 主页](https://github.com/SergioTermann)''')
 for i,c in enumerate(cells): c['id']=f'exp03-{i:02d}'
 nb=dict(nbformat=4,nbformat_minor=5,cells=cells,metadata=dict(
     kernelspec=dict(display_name='Python (verl GPU)',language='python',name='verl-gpu'),
     language_info=dict(name='python',version='3.12')))
-(Path(__file__).resolve().parents[2] / '03_group_reward_learning.ipynb').write_text(json.dumps(nb,ensure_ascii=False,indent=2),encoding='utf-8')
+(Path(__file__).resolve().parents[2] / '03_用组内奖励微调语言模型.ipynb').write_text(json.dumps(nb,ensure_ascii=False,indent=2),encoding='utf-8')

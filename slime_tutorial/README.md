@@ -6,10 +6,10 @@ slime 的核心是 Megatron 训练、SGLang rollout、Ray 资源编排和数据�
 
 ## 课程
 
-- [S00：系列首页](00_START_HERE.ipynb)
-- [S01：架构与源码](01_architecture_and_source.ipynb)
-- [S02：Sample 与奖励](02_samples_and_rewards.ipynb)
-- [S03：分离调试与验收](03_debugging_and_run_contract.ipynb)
+- [S00：系列首页](00_课程导航.ipynb)
+- [S01：架构与源码](01_从训练主循环读懂slime架构.ipynb)
+- [S02：Sample 与奖励](02_理解样本、奖励与词元掩码.ipynb)
+- [S03：分离调试与验收](03_分离调试与训练验收.ipynb)
 - [后续路线](ROADMAP.md)
 - [验证记录](VALIDATION.md)
 - [SGLang GPU 修复与本机启动](sglang_local/README.md)

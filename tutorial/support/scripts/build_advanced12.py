@@ -4,7 +4,7 @@ root=Path(__file__).resolve().parents[2]
 cells=[]
 def md(s):cells.append(dict(cell_type='markdown',metadata={},source=s))
 def code(s):cells.append(dict(cell_type='code',metadata={},source=s,outputs=[],execution_count=None))
-md('''# 高级 12 · 有意义的奖励，为何仍然学不动？
+md('''# 实验 12 · 诊断稀疏奖励
 
 上一课证明真实 verl 工程链路可运行。本课把合成字节奖励换成明确任务：读入两个十进制数字，判断数值是否为偶数，只接受单个 `yes` 或 `no`。
 
@@ -22,6 +22,7 @@ from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 scripts=Path('support/advanced12').resolve()
+# latest_run.txt 保存的是本次训练目录的路径。先读出路径，再去那个目录找日志、指标或检查点。
 run_root=Path((scripts/'latest_run.txt').read_text().strip())
 print('本课读取已完成的真实训练，不会自动重跑。')
 print('运行目录:',run_root)
@@ -35,6 +36,7 @@ md('''## 2 · 严格奖励与漏洞检查
 大小写和首尾空白会归一化；这与评分标准一致。这里不要求 EOS，只按解码后的文本评分，与训练奖励保持一致。''')
 code('''spec=importlib.util.spec_from_file_location('reward12',scripts/'reward.py')
 reward=importlib.util.module_from_spec(spec);spec.loader.exec_module(reward)
+# 每个三元组依次是模型回答、标准答案、预期奖励。逐项喂给真实评分函数，检查大小写、空白和含糊回答的边界。
 cases=[('yes','yes',1),('no','yes',0),('yes no','yes',0),('YES ','yes',1),('','yes',0),('yes yes','yes',0)]
 for answer,target,expected in cases:assert reward.compute_score('decimal_parity',answer,target)==expected
 print((scripts/'reward.py').read_text())
@@ -54,6 +56,7 @@ display(summary)
 print(json.dumps(report,indent=2))
 metrics=pd.read_csv(run_root/'metrics.csv')
 fig,axes=plt.subplots(1,2,figsize=(10,3))
+# 按同一个训练步对照两张图：平均奖励描述这一批的得分，梯度范数描述 actor 收到的更新信号。组内同分也可能出现非零平均奖励。
 axes[0].plot(metrics['training/global_step'],metrics['critic/rewards/mean'],marker='o')
 axes[0].set(title='Actual rollout mean reward',xlabel='Step',ylim=(-.05,1.05))
 axes[1].plot(metrics['training/global_step'],metrics['actor/grad_norm'],marker='o')
@@ -88,6 +91,12 @@ for name in ['evaluation.csv','metrics.csv','predictions.csv']:
     (out/name).write_bytes((run_root/name).read_bytes())
 print('已保存:',out.resolve())
 print('PASS：10 步真实训练完成，最终测试和失败诊断已记录；不宣称性能提升。')''')
+md('''---
+
+<a href="https://github.com/SergioTermann"><img src="support/assets/logo.png" alt="SergioTermann" width="44" height="44" align="left" style="margin: 0 12px 0 0;"></a>
+
+**更多有趣的 AI 课程**  
+[← 访问 SergioTermann 的 GitHub 主页](https://github.com/SergioTermann)''')
 for i,c in enumerate(cells):c['id']=f'advanced12-{i:02d}'
 meta=dict(kernelspec=dict(display_name='Python (verl GPU)',language='python',name='verl-gpu'),language_info=dict(name='python',version='3.12'))
-(root/'12_sparse_reward_diagnosis.ipynb').write_text(json.dumps(dict(nbformat=4,nbformat_minor=5,metadata=meta,cells=cells),ensure_ascii=False,indent=2),encoding='utf-8')
+(root/'12_诊断稀疏奖励.ipynb').write_text(json.dumps(dict(nbformat=4,nbformat_minor=5,metadata=meta,cells=cells),ensure_ascii=False,indent=2),encoding='utf-8')

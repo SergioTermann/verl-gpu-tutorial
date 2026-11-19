@@ -19,6 +19,7 @@ def environment():
     assert torch.cuda.is_available(), 'CUDA 不可用，请通过 start-notebook.ps1 启动 WSL 环境'
     print(f'GPU: {torch.cuda.get_device_name(0)} | CUDA {torch.version.cuda}', flush=True)
     from flash_attn import flash_attn_func
+    # 这四个维度依次是批大小、序列长度、注意力头数和每个头的维度。device 指定在 GPU 上创建张量。
     q = torch.randn(1, 32, 2, 64, device='cuda', dtype=torch.float16)
     assert torch.isfinite(flash_attn_func(q, q, q)).all()
     print('PASS：真实 CUDA 运算与 FlashAttention 均通过。', flush=True)
@@ -36,12 +37,14 @@ def benchmark():
         for _ in range(3):
             z = x @ y
         if device == 'cuda':
+            # CUDA 调用可以提前把控制权还给 Python；同步会等已提交的 GPU 工作完成，再读时钟才有意义。
             torch.cuda.synchronize()
         samples = []
         for i in range(10):
             start = time.perf_counter()
             z = x @ y
             if device == 'cuda':
+                # CUDA 调用可以提前把控制权还给 Python；同步会等已提交的 GPU 工作完成，再读时钟才有意义。
                 torch.cuda.synchronize()
             samples.append(1000 * (time.perf_counter() - start))
             print(f'{device:4s} 第 {i+1:02d} 次：{samples[-1]:.3f} ms', flush=True)
@@ -58,10 +61,14 @@ def benchmark():
 def reward():
     import torch
     from verl import DataProto
+    # DataProto 是 verl 传递一个批次数据的容器。input_ids 的每行是一条序列，每列是一个 token 的编号。
+    # 这里形状为 [2, 2]；len(batch) 读第一维，所以预期打印 2。下面的四个候选答案是另一组教学数据。
     batch = DataProto.from_dict(tensors={'input_ids': torch.tensor([[1, 2], [3, 4]])})
     print(f'真实 verl.DataProto 批次：{len(batch)} 条数据', flush=True)
     answers = ['4', '5', '4', '3']
     scores = torch.tensor([float(x == '4') for x in answers])
+    # 先预测符号：奖励 [1, 0, 1, 0] 的均值是 0.5，两个答对的候选会得到正优势。
+    # 减去组均值是在问“比同题的其他回答好多少”；除以标准差调整尺度，小常数避免除零。
     advantages = (scores - scores.mean()) / (scores.std() + 1e-6)
     for answer, score, advantage in zip(answers, scores, advantages):
         print(f'问题 2+2=? | 回答 {answer} | 奖励 {score:.0f} | 组内标准化优势 {advantage:+.3f}', flush=True)
@@ -73,6 +80,7 @@ def train():
     import torch
     torch.manual_seed(42)
     torch.cuda.manual_seed_all(42)
+    # 四个分数各对应一个答案。Parameter 让优化器可以更新它们；初始分数相同，所以每个答案概率都是 1/4。
     logits = torch.nn.Parameter(torch.zeros(4, device='cuda'))
     optimizer = torch.optim.Adam([logits], lr=0.08)
     print('GPU 上的四选一策略：2+2=?，候选答案 [3,4,5,6]。', flush=True)
@@ -80,6 +88,7 @@ def train():
     for step in range(81):
         dist = torch.distributions.Categorical(logits=logits)
         probability = dist.probs[1].item()
+        # 从当前策略抽 128 次；actions 存的是候选下标。下标 1 对应答案 4，因此下一行用 actions == 1 打分。
         actions = dist.sample((128,))
         rewards = (actions == 1).float()
         if step % 2 == 0:
@@ -88,6 +97,7 @@ def train():
             time.sleep(0.08)
         if step == 80:
             break
+        # log_prob 取出实际抽到的答案的对数概率。奖励为 1 的项贡献梯度，前面的负号让最小化 loss 提高这些答案的概率。
         loss = -(dist.log_prob(actions) * rewards).mean()
         optimizer.zero_grad()
         loss.backward()
@@ -101,6 +111,9 @@ def train():
 def config():
     import subprocess
     print('加载当前安装的 verl 训练配置，不启动大模型训练……', flush=True)
+    # 逐项读这个命令：sys.executable 选当前内核，-m 按模块名运行 verl.trainer.main_ppo。
+    # -m 后的 --cfg job 由 Hydra 解析，打印合成后的任务配置后退出。把输出中的 adv_estimator 与传入的 grpo 对照。
+    # 点号沿配置层级向下查找。trainer.nnodes=1 表示一台机器，trainer.n_gpus_per_node=1 表示每台用一张 GPU。
     process = subprocess.Popen([sys.executable, '-u', '-m', 'verl.trainer.main_ppo', '--cfg', 'job',
                                 'algorithm.adv_estimator=grpo', 'trainer.n_gpus_per_node=1',
                                 'trainer.nnodes=1'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT,

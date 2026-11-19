@@ -14,13 +14,16 @@ tokens += [f'w{i}' for i in range(256 - len(tokens))]
 raw = Tokenizer(models.WordLevel({token: i for i, token in enumerate(tokens)}, unk_token='[UNK]'))
 raw.pre_tokenizer = pre_tokenizers.WhitespaceSplit()
 tokenizer = PreTrainedTokenizerFast(tokenizer_object=raw, pad_token='[PAD]', unk_token='[UNK]', bos_token='[BOS]', eos_token='[EOS]')
+# 同一条用户消息在训练和生成阶段必须编码一致。模板末尾的 assistant 标记告诉模型从哪个角色开始续写。
 tokenizer.chat_template = "{% for message in messages %}{{ message['role'] + ' ' + message['content'] + ' ' }}{% endfor %}{% if add_generation_prompt %}assistant {% endif %}"
 tokenizer.save_pretrained(model_dir)
 config = Qwen2Config(vocab_size=256, hidden_size=256, intermediate_size=512, num_hidden_layers=2,
                     num_attention_heads=4, num_key_value_heads=2, max_position_embeddings=256,
                     pad_token_id=0, bos_token_id=2, eos_token_id=3, tie_word_embeddings=True)
+# 从配置构造随机初始化的小模型。两个阶段共用这个目录里的权重和 tokenizer，这样采样到的 token ID 才能用于策略更新。
 model = Qwen2ForCausalLM(config).to(torch.bfloat16)
 model.save_pretrained(model_dir)
+# prompt 给生成器；reward_model 是评分侧的数据。这一课的合成评分直接由回答字节计算，因此没有用到 ground_truth。
 rows = [dict(data_source='local_smoke', prompt=[dict(role='user', content=f'count one two three w{i}')],
              ability='smoke_test', reward_model=dict(style='rule', ground_truth='unused'),
              extra_info=dict(index=i, split='train')) for i in range(4)]

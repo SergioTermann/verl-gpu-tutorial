@@ -11,6 +11,12 @@ def code(s): cells.append(dict(cell_type='code', metadata={}, source=s.strip()+'
 
 
 def save(name):
+    md('''---
+
+<a href="https://github.com/SergioTermann"><img src="support/assets/logo.png" alt="SergioTermann" width="44" height="44" align="left" style="margin: 0 12px 0 0;"></a>
+
+**更多有趣的 AI 课程**  
+[← 访问 SergioTermann 的 GitHub 主页](https://github.com/SergioTermann)''')
     for i,c in enumerate(cells):
         c['id']=f'{name[:2]}-{i:02d}';c['source']=c['source'].splitlines(keepends=True)
     (ROOT/name).write_text(json.dumps(dict(nbformat=4,nbformat_minor=5,cells=cells,
@@ -19,7 +25,7 @@ def save(name):
     cells.clear()
 
 
-md(r'''# 第 17 课 · 预训练模型上的 LoRA 与模型交付
+md(r'''# 实验 17 · 用 LoRA 微调和导出预训练模型
 
 前面的模型从随机参数学习小任务。本课使用固定版本的 Qwen2.5-0.5B-Instruct，训练一个合成工单路由器。目标是掌握预训练模型的输入协议、回答掩码、参数高效微调及模型交付验证，准确率是否提高要看实际结果。
 
@@ -62,6 +68,7 @@ md('''## 2 · 先审查数据和标签，再训练
 code('''from transformers import AutoTokenizer
 tokenizer=AutoTokenizer.from_pretrained(model_path,local_files_only=True)
 row=splits['train'][0]
+# 同一位置有输入 ID 和训练标签。打印 labels 中非 -100 的部分，检查实际被监督的是回答和结束符。
 ids,labels=lesson.encode(tokenizer,row)
 print('完整输入:',tokenizer.decode(ids))
 print('参与损失的 token:',tokenizer.decode([x for x in labels if x!=-100]))
@@ -91,6 +98,7 @@ def live(history):
     print(frame.tail(1).to_string(index=False))
 if RUN_TRAINING:
     run=Path.home()/'verl-advanced17/runs'/f'{time.strftime("%Y%m%d-%H%M%S")}-{time.time_ns()}'
+    # 调用本课的 LoRA 训练与导出流程。查看 checks，核对适配器重载和权重合并后预测是否一致。
     manifest,checks=lesson.train(run,callback=live)
     (out/'latest_run.txt').write_text(str(run))  # 成功完成后才写入
 else:
@@ -123,9 +131,9 @@ md('''## 5 · 验收与下一次消融
 下一项研究应在新的开发/最终划分上比较 rank、target modules 与学习率，并加入可承受的全量微调对照。当前只验证一个配置、一个种子，不声称 LoRA 优于全量微调。合并模型将在第 18 课通过本地 HTTP 服务再做回归检查。
 
 参考：[LoRA 论文](https://arxiv.org/abs/2106.09685)、[PEFT LoRA 指南](https://huggingface.co/docs/peft/developer_guides/lora)、[聊天模板](https://huggingface.co/docs/transformers/chat_templating)。''')
-save('17_pretrained_lora.ipynb')
+save('17_用LoRA微调和导出预训练模型.ipynb')
 
-md('''# 第 18 课 · 本地流式服务与并发评估
+md('''# 实验 18 · 测试流式推理服务与并发性能
 
 模型在 Notebook 里答对，不代表服务交付正确。本课使用第 17 课合并模型，启动本机 vLLM OpenAI-compatible 接口，测量流式响应、并发、错误率与答案回归。无需外部 API 密钥，不上传数据，不开放互联网访问。
 
@@ -160,12 +168,14 @@ TTFT 从客户端开始 HTTP 请求到收到第一个非空文本片段。空的
 SSE 的一个 chunk 不一定等于一个 token。我们单独记录 chunk 数量与相邻 chunk 间隔，并用服务报告的 completion_tokens 估算 TPOT。由于 EOS 可能计入 token 数、多个 token 可能合并为一个 chunk，这个 TPOT 只是客户端近似值，不当作精确的逐 token 调度时间。
 
 下面会启动并等待服务，完成压测后关闭。初始化可能需要几分钟，原始日志写入独立 Linux 运行目录。测量期间不要运行其他 GPU 实验。''')
-code('''server=serving.LocalServer(run/'merged',server_logs)
+code('''# 使用第 17 课导出的合并模型启动本机服务。启动耗时单独记录，后续请求指标衡量服务就绪后的表现。
+server=serving.LocalServer(run/'merged',server_logs)
 started=time.perf_counter()
 try:
     server.start()
     startup=time.perf_counter()-started
     print(f'本地服务已就绪，启动耗时 {startup:.1f}s。正在执行并发测试。',flush=True)
+    # 同一批题重复请求，记录流式响应和并发测量。读结果时把首个 token 的等待时间与整条回答的耗时分开。
     summary=serving.benchmark(server,rows,lesson.messages,out,repeats=3)
     display(summary)
 finally:
@@ -214,4 +224,4 @@ md('''## 4 · 怎样读懂 p95 与吞吐
 下一次实验只改变一个因素：打开 prefix cache、增加输出长度或提高并发。预先记录预期影响，再测质量与延迟。测试多卡、张量并行或量化时，需要重新验证数值与服务行为。
 
 参考：[vLLM OpenAI-compatible server](https://docs.vllm.ai/en/latest/serving/openai_compatible_server/)。所有性能结论都应注明硬件、模型、请求分布和测量窗口。''')
-save('18_streaming_service_benchmark.ipynb')
+save('18_测试流式推理服务与并发性能.ipynb')

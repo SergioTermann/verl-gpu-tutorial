@@ -2,10 +2,16 @@
 import ast
 import json
 from pathlib import Path
+from textwrap import dedent
 
 ROOT = Path(__file__).resolve().parents[2]
-tree = ast.parse((ROOT / 'support' / 'scripts' / 'lessons.py').read_text(encoding='utf-8'))
-functions = {n.name: ast.unparse(ast.Module(body=n.body, type_ignores=[])) for n in tree.body if isinstance(n, ast.FunctionDef)}
+
+source = (ROOT / 'support' / 'scripts' / 'lessons.py').read_text(encoding='utf-8')
+lines = source.splitlines(keepends=True)
+functions = {
+    node.name: dedent(''.join(lines[node.lineno:node.end_lineno])).rstrip()
+    for node in ast.parse(source).body if isinstance(node, ast.FunctionDef)
+}
 cells = []
 
 
@@ -17,7 +23,7 @@ def code(text):
     cells.append({'cell_type': 'code', 'metadata': {}, 'source': text, 'outputs': [], 'execution_count': None})
 
 
-md('''# 实验 01 · 从 GPU 到 verl：动手入门
+md('''# 实验 01 · 从 GPU 到 verl 的第一步
 
 本课使用 verl 0.7.1，参考 GPU 为 RTX 4060 8GB，无需下载模型。
 
@@ -34,6 +40,7 @@ md('''# 实验 01 · 从 GPU 到 verl：动手入门
 下一格只导入工具。Notebook 会保留变量，因此后面的格子可以使用这里的导入。''')
 code('''import sys, time, statistics
 from pathlib import Path
+from textwrap import dedent
 import torch
 import matplotlib.pyplot as plt
 from IPython.display import display, clear_output
@@ -42,6 +49,7 @@ def emit(**values):
     print(values)
 
 print('Python:', sys.executable)
+# sys.executable 是此页内核实际使用的 Python。先确认路径，再解释后面打印的 verl 和 CUDA 版本。
 assert sys.executable.startswith('/opt/verl-venv/'), '请选择 Python (verl GPU) 内核'
 print('准备完成。接下来查看真实显卡。')''')
 md('''## 1 · 确认代码真的在 GPU 上运行
@@ -143,6 +151,12 @@ md('''## 6 · 从这个实验走向真实训练
 
 完成后，你应该能解释：代码怎样进入 GPU、奖励怎样改变策略，以及 verl 如何把这些步骤组织成语言模型训练流程。''')
 notebook = {'nbformat': 4, 'nbformat_minor': 5, 'metadata': {'kernelspec': {'display_name': 'Python (verl GPU)', 'language': 'python', 'name': 'verl-gpu'}, 'language_info': {'name': 'python', 'version': '3.12'}}, 'cells': cells}
+md('''---
+
+<a href="https://github.com/SergioTermann"><img src="support/assets/logo.png" alt="SergioTermann" width="44" height="44" align="left" style="margin: 0 12px 0 0;"></a>
+
+**更多有趣的 AI 课程**  
+[← 访问 SergioTermann 的 GitHub 主页](https://github.com/SergioTermann)''')
 for i, cell in enumerate(cells):
     cell['id'] = f'lesson-{i:02d}'
-(ROOT / '01_verl_gpu_beginner.ipynb').write_text(json.dumps(notebook, ensure_ascii=False, indent=2), encoding='utf-8')
+(ROOT / '01_从GPU到verl的第一步.ipynb').write_text(json.dumps(notebook, ensure_ascii=False, indent=2), encoding='utf-8')

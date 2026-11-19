@@ -9,6 +9,17 @@ export WANDB_MODE=disabled
 export RAY_DEDUP_LOGS=0
 export OMP_NUM_THREADS=2
 python local_smoke/prepare.py
+# 读命令：python -m 运行 Python 模块；行尾的反斜杠把下面多行接成一条命令。
+# 后面每个 key=value 都是 Hydra 配置覆盖。点号表示层级，例如 rollout.n 位于 actor_rollout_ref 下。
+# ① 取题。data.train_files 指向训练 Parquet；train_batch_size=4 表示一批取 4 条提示。
+# ② 采样。model.path 提供初始权重；rollout.name=vllm 选择生成引擎。rollout.n=2 表示每题采样 2 次，
+#    所以一批得到 4 × 2 = 8 条回答。max_response_length 按新生成的 token 计数。
+# ③ 打分。custom_reward_function.path 和 name 一起定位 Python 函数；每条回答得到一个标量奖励。
+# ④ 更新。GRPO 在同题的候选中比较奖励。组内同分时，这组的相对优势为零。
+#    actor.optim.lr 是学习率；ppo_mini_batch_size 管更新分组，micro_batch_size_per_gpu 管单卡计算分块。
+# ⑤ 看资源。tensor_model_parallel_size 是生成引擎的张量并行度；gpu_memory_utilization 是它的显存预算比例。
+#    max_num_seqs、max_num_batched_tokens 分别限制引擎一次调度的序列数、token 数，并不改变每题采样数。
+# ⑥ 找结果。trainer.total_training_steps=1 给训练步数设上限；save_freq 以训练步计，default_local_dir 指向检查点目录。
 python -m verl.trainer.main_ppo \
   algorithm.adv_estimator=grpo \
   data.train_files=/opt/verl-smoke/train.parquet \

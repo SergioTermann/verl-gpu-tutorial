@@ -3,14 +3,14 @@ import json
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[2]
-previous=json.loads((ROOT/'05_model_playground.ipynb').read_text(encoding='utf-8'))
+previous=json.loads((ROOT/'05_用交互评估台检验模型.ipynb').read_text(encoding='utf-8'))
 generate_source=[''.join(c['source']) for c in previous['cells'] if c['cell_type']=='code'][1]
 generate_source=generate_source[:generate_source.index('for name,model in models.items():')]
 cells=[]
 def md(s):cells.append(dict(cell_type='markdown',metadata={},source=s))
 def code(s):cells.append(dict(cell_type='code',metadata={},source=s,outputs=[],execution_count=None))
 
-md('''# 实验 06 · 用数据覆盖修复模型的薄弱环节
+md('''# 实验 06 · 用数据覆盖改善泛化
 
 上一课的评估暴露了两个薄弱环节：数字超出训练范围，以及输入带有前导零。本课保留第四课的 SFT 模型作为冻结对照，复制一份继续训练，将数据扩展到 0 至 69 的加法，并同时提供普通与前导零格式。
 
@@ -52,7 +52,8 @@ md('''## 2 · 先划分数对，再生成格式变体
 每组最终评估只取一个固定方向，普通格式和前导零格式分别评分。同一数对的两种格式是配对观测，不能当成两个独立样本来夸大样本量。
 
 额外保留 70 至 99 的 100 组题作为真正超出本次训练数字范围的测试，不参与训练或验证。此前已看过的第五课题目不进入新的最终测试。''')
-code('''def canonical(pair):return tuple(sorted(pair))
+code('''# 把 (a,b) 和 (b,a) 归到同一组。划分训练与测试时按组隔离，避免交换顺序后的同一道题泄漏到测试集。
+def canonical(pair):return tuple(sorted(pair))
 known={canonical(p) for p in prior['train_pairs']+prior['test_pairs']}
 for suite in prior_eval['suites']:
     known.update(canonical(p) for p in suite['pairs'])
@@ -83,6 +84,7 @@ code(generate_source+'''
 examples=sorted({(prompt_for(a,b,padded),str(a+b)) for a,b in train_pairs for padded in [False,True]})
 MAX_LEN=12
 ids=torch.full((len(examples),MAX_LEN),PAD,dtype=torch.long)
+# labels 控制哪些位置算损失，attention_mask 控制哪些位置可被注意。提示可以参与注意力，同时被排除在答案损失之外。
 labels=torch.full_like(ids,-100);mask=torch.zeros_like(ids)
 for i,(prompt,target) in enumerate(examples):
     sequence=[stoi[c] for c in prompt+target+'#']
@@ -128,6 +130,7 @@ for step in range(1,STEPS+1):
         axes[1].set(title='Validation only / final test stays unused',xlabel='Step',ylim=(0,1.05))
         axes[1].legend();fig.tight_layout();live.update(fig);plt.close(fig)
         print(f"step {step:4d} | loss {row['loss']:.4f} | validation plain {plain:.1%} / zeros {zeros:.1%}",flush=True)
+# CUDA 调用可以提前把控制权还给 Python；同步会等已提交的 GPU 工作完成，再读时钟才有意义。
 torch.cuda.synchronize();elapsed=time.perf_counter()-start
 model.eval()
 print(f'固定训练结束，用时 {elapsed:.1f} 秒。现在才开始最终测试。')''')
@@ -148,6 +151,7 @@ for suite,pairs in [('Fresh in-range',final_pairs),('Outside 70-99',outside_pair
 details=pd.DataFrame(rows)
 summary=details.groupby(['suite','format','model'],sort=False).agg(count=('correct','size'),accuracy=('correct','mean')).reset_index()
 display(summary.style.format({'accuracy':'{:.1%}'}))
+# 把长表按测试组和模型展开；沿同一行横向读，可以在相同题目集合上比较各模型的准确率。
 wide=summary.pivot(index=['suite','format'],columns='model',values='accuracy')
 ax=wide[['before','after']].plot.bar(figsize=(9,4),color=['#94a3b8','#059669'])
 ax.set(ylim=(0,1.05),ylabel='Strict exact-match accuracy',xlabel='',title='Frozen old model vs expanded-coverage model')
@@ -175,7 +179,13 @@ record=dict(seed=SEED,steps=STEPS,batch=BATCH,lr=LR,elapsed_seconds=elapsed,voca
 assert source_hash==hashlib.sha256((root/'sft/model.safetensors').read_bytes()).hexdigest()
 assert all(torch.equal(a,b) for a,b in zip(baseline.state_dict().values(),Qwen2ForCausalLM.from_pretrained(root/'sft').cuda().state_dict().values()))
 print('已保存:',out.resolve(),'；旧模型权重保持不变。')''')
+md('''---
+
+<a href="https://github.com/SergioTermann"><img src="support/assets/logo.png" alt="SergioTermann" width="44" height="44" align="left" style="margin: 0 12px 0 0;"></a>
+
+**更多有趣的 AI 课程**  
+[← 访问 SergioTermann 的 GitHub 主页](https://github.com/SergioTermann)''')
 for i,c in enumerate(cells):c['id']=f'exp06-{i:02d}'
 nb=dict(nbformat=4,nbformat_minor=5,cells=cells,metadata=previous['metadata'])
 nb['metadata'].pop('widgets',None)
-(ROOT/'06_data_coverage.ipynb').write_text(json.dumps(nb,ensure_ascii=False,indent=2),encoding='utf-8')
+(ROOT/'06_用数据覆盖改善泛化.ipynb').write_text(json.dumps(nb,ensure_ascii=False,indent=2),encoding='utf-8')

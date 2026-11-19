@@ -3,8 +3,8 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-n2 = json.loads((ROOT/'02_tiny_language_model.ipynb').read_text(encoding='utf-8'))
-n3 = json.loads((ROOT/'03_group_reward_learning.ipynb').read_text(encoding='utf-8'))
+n2 = json.loads((ROOT/'02_训练微型语言模型.ipynb').read_text(encoding='utf-8'))
+n3 = json.loads((ROOT/'03_用组内奖励微调语言模型.ipynb').read_text(encoding='utf-8'))
 def sources(nb):
     return [''.join(c['source']) for c in nb['cells'] if c['cell_type']=='code']
 c2,c3=sources(n2),sources(n3)
@@ -12,7 +12,7 @@ cells=[]
 def md(s): cells.append(dict(cell_type='markdown',metadata={},source=s))
 def code(s): cells.append(dict(cell_type='code',metadata={},source=s,outputs=[],execution_count=None))
 
-md('''# 实验 04 · 留出学习空间，看清训练带来的变化
+md('''# 实验 04 · 对比冻结模型、监督训练与奖励微调
 
 上一课的初始模型在参考运行中已有 97.5% 的训练准确率，进一步改善的空间较小。为了观察学习过程，本课重新创建相同结构的微型 Qwen2，只做 200 步监督预热，再复制成三个参数完全相同的模型。
 
@@ -96,6 +96,7 @@ for step in range(1,SFT_STEPS+1):
         ax.set(xlabel='SFT updates',ylabel='Exact-match accuracy',ylim=(0,1.05))
         ax.legend();fig.tight_layout();sft_live.update(fig);plt.close(fig)
         print(f'SFT {step:4d} | train {tr:.2%} | test {te:.2%}',flush=True)
+# CUDA 调用可以提前把控制权还给 Python；同步会等已提交的 GPU 工作完成，再读时钟才有意义。
 torch.cuda.synchronize()
 sft_seconds=time.perf_counter()-sft_start
 sft_model.eval()
@@ -123,6 +124,7 @@ import pandas as pd
 table=pd.DataFrame([dict(question=f'{a}+{b}=',target=str(a+b),baseline=b0,sft=s,rl=r)
     for (a,b),b0,s,r in zip(test_pairs,baseline_answers,sft_answers,rl_answers)])
 display(table.style.apply(lambda row:['background-color: #dcfce7' if col in ('baseline','sft','rl') and row[col]==row['target'] else '' for col in table.columns],axis=1))
+# 逐张量对比冻结参考模型与起始快照。再看 actor 是否改变，可区分参考模型和实际接受梯度更新的策略。
 assert all(torch.equal(initial_state[k],v.detach().cpu()) for k,v in reference.state_dict().items())
 assert any(not torch.equal(initial_state[k],v.detach().cpu()) for k,v in actor.state_dict().items())
 print('验证通过：冻结对照没有变化，RL 模型已更新。')
@@ -151,6 +153,12 @@ md('''## 怎样解读“明显”
 - 本实验仍然是单种子演示。要做研究结论，需要多个随机种子、验证集和未反复查看的新最终测试集。
 
 本教程是教学版 GRPO 风格循环，未运行完整 verl 分布式训练器。''')
+md('''---
+
+<a href="https://github.com/SergioTermann"><img src="support/assets/logo.png" alt="SergioTermann" width="44" height="44" align="left" style="margin: 0 12px 0 0;"></a>
+
+**更多有趣的 AI 课程**  
+[← 访问 SergioTermann 的 GitHub 主页](https://github.com/SergioTermann)''')
 for i,c in enumerate(cells):c['id']=f'exp04-{i:02d}'
 nb=dict(nbformat=4,nbformat_minor=5,cells=cells,metadata=n3['metadata'])
-(ROOT/'04_visible_learning_comparison.ipynb').write_text(json.dumps(nb,ensure_ascii=False,indent=2),encoding='utf-8')
+(ROOT/'04_对比冻结模型、监督训练与奖励微调.ipynb').write_text(json.dumps(nb,ensure_ascii=False,indent=2),encoding='utf-8')

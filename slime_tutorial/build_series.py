@@ -6,25 +6,31 @@ cells=[]
 def md(s):cells.append(dict(cell_type='markdown',metadata={},source=s.strip()+'\n'))
 def code(s):cells.append(dict(cell_type='code',metadata={},source=s.strip()+'\n',outputs=[],execution_count=None))
 def save(name):
+    md('''---
+
+<a href="https://github.com/SergioTermann"><img src="assets/logo.png" alt="SergioTermann" width="44" height="44" align="left" style="margin: 0 12px 0 0;"></a>
+
+**更多有趣的 AI 课程**  
+[← 访问 SergioTermann 的 GitHub 主页](https://github.com/SergioTermann)''')
     for i,c in enumerate(cells):c['id']=f'slime-{name[:2]}-{i:02d}';c['source']=c['source'].splitlines(keepends=True)
     (ROOT/name).write_text(json.dumps(dict(nbformat=4,nbformat_minor=5,cells=cells,metadata=dict(kernelspec=dict(name='verl-gpu',display_name='Python (verl GPU)',language='python'),language_info=dict(name='python',version='3.12'))),ensure_ascii=False,indent=2)+'\n',encoding='utf-8');cells.clear()
 
-md('''# slime 独立学习系列
+md('''# slime 中文课程导航
 
 从 S01 重新编号，不依赖 verl 教程的模型或实验产物。学习目标是理解 slime 的数据、生成、训练与权重同步契约，能够在合适的独立环境中设计和审查实验。
 
 | 课程 | 内容 | 本机执行范围 |
 |---|---|---|
-| [S01：架构与源码](01_architecture_and_source.ipynb) | Megatron、SGLang、Ray 与训练入口 | 固定源码读取、依赖检查 |
-| [S02：Sample 与奖励](02_samples_and_rewards.ipynb) | 真实数据对象、异步奖励、组与 mask | 官方 Sample 导入、接口与反例测试 |
-| [S03：分离调试与验收](03_debugging_and_run_contract.ipynb) | rollout-only、train-only、恢复和权重同步 | 源码检查、实验计划与配置审阅 |
+| [S01：架构与源码](01_从训练主循环读懂slime架构.ipynb) | Megatron、SGLang、Ray 与训练入口 | 固定源码读取、依赖检查 |
+| [S02：Sample 与奖励](02_理解样本、奖励与词元掩码.ipynb) | 真实数据对象、异步奖励、组与 mask | 官方 Sample 导入、接口与反例测试 |
+| [S03：分离调试与验收](03_分离调试与训练验收.ipynb) | rollout-only、train-only、恢复和权重同步 | 源码检查、实验计划与配置审阅 |
 
 先读 [安装与系列说明](README.md)。前三课不启动 Megatron/SGLang 完整训练；使用现有 Python 内核只运行 CPU 可执行内容。完整训练需要独立环境，不能把本系列的 PASS 当作端到端训练成功。
 
 每课先预测结果，再运行代码，最后回答验收题。后续课程计划见 [学习路线](ROADMAP.md)。''')
-save('00_START_HERE.ipynb')
+save('00_课程导航.ipynb')
 
-md('''# S01 · 从训练主循环理解 slime
+md('''# 实验 01 · 从训练主循环读懂 slime 架构
 
 slime 将 Megatron 训练与 SGLang rollout 连接起来，允许自定义生成和奖励。Ray 负责进程与远程调用。数据缓冲与传输层连接 prompt、生成样本和训练批次，具体实现随版本演进。
 
@@ -74,9 +80,9 @@ md('''## 4 · 环境选择与验收
 完整训练请新建环境，固定源码 commit、镜像 digest、驱动和模型 revision。不要把 `latest` 镜像标签当作可复现版本，也不要在原 verl venv 内直接升级整套 CUDA/推理依赖。
 
 验收：画出一条样本的 prompt → rollout → reward → train → weight sync 路径。说明模型/优化器 checkpoint、rollout 缓冲和 Ray 进程各自保存什么，列出三个无法仅凭退出码判断的错误。''')
-save('01_architecture_and_source.ipynb')
+save('01_从训练主循环读懂slime架构.ipynb')
 
-md('''# S02 · 真实 Sample、奖励契约与 token 对齐
+md('''# 实验 02 · 理解样本、奖励与词元掩码
 
 本课直接导入固定版本 slime.utils.types.Sample，而非自定义一个同名替身。只使用 CPU；token ID 和 log-prob 为明确标注的人工测试夹具，不是模型生成结果。
 
@@ -140,9 +146,9 @@ md('''## 4 · 课后验收
 为截断、空响应、只有工具返回、奖励超时分别定义处理规则。Sample 的 COMPLETED、TRUNCATED、ABORTED、FAILED 不应被一律归为“模型答错”；系统失败率与任务准确率要分开报告。
 
 再尝试把奖励函数改成“包含 yes 就得分”，预测哪条攻击样例会通过。不要把这项修改带入正式评分。下一课用这些契约设计完整训练的调试顺序。''')
-save('02_samples_and_rewards.ipynb')
+save('02_理解样本、奖励与词元掩码.ipynb')
 
-md('''# S03 · 分离调试与完整训练的验收标准
+md('''# 实验 03 · 分离调试与训练验收
 
 本课生成可审查的实验计划，并核对官方调试参数。它不输出一个未经验证的“一键训练成功”命令。完整 Megatron+SGLang 作业必须结合模型转换、硬件、并行划分与容器版本确定。
 
@@ -198,4 +204,4 @@ Megatron 参数直接进入其训练配置；SGLang 参数通常增加 `--sglang
 在独立且兼容的 GPU 环境确定后，依次完成官方最小配方、真实自定义奖励、多轮工具轨迹、异步采样与恢复实验。每一节都保留配置、失败日志、逐样本输出和验收报告。
 
 验收作业：给出你准备运行的镜像 digest、源码 commit、模型 revision、硬件拓扑和数据哈希；说明出错时如何切到固定 rollout 重放。仅打印配置或创建 Sample 不计作完成真实训练。''')
-save('03_debugging_and_run_contract.ipynb')
+save('03_分离调试与训练验收.ipynb')

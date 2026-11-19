@@ -1,15 +1,15 @@
 {
-  "08_sampling_and_rewards.ipynb": {
+  "08_采样温度与奖励漏洞.ipynb": {
     "executed": true,
     "cells": 2,
     "errors": 0
   },
-  "09_checkpoints_and_reproducibility.ipynb": {
+  "09_保存检查点与恢复训练.ipynb": {
     "executed": true,
     "cells": 2,
     "errors": 0
   },
-  "10_verl_bridge_and_graduation.ipynb": {
+  "10_将数据和模型接入verl.ipynb": {
     "executed": true,
     "cells": 5,
     "errors": 0

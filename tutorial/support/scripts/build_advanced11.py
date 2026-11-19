@@ -4,7 +4,7 @@ ROOT=Path(__file__).resolve().parents[2]
 cells=[]
 def md(s):cells.append(dict(cell_type='markdown',metadata={},source=s))
 def code(s):cells.append(dict(cell_type='code',metadata={},source=s,outputs=[],execution_count=None))
-md('''# 高级 11 · 运行 verl 单步 GRPO 训练
+md('''# 实验 11 · 运行单步 GRPO 训练
 
 本课调用 verl trainer，完成一次完整更新：Ray 协调进程，vLLM 生成回答，奖励函数评分，GRPO 计算组内优势，FSDP actor 更新参数，最后保存检查点。
 
@@ -23,6 +23,7 @@ code('''import sys,json,os,subprocess,time,signal
 from pathlib import Path
 import pandas as pd
 import torch
+# sys.executable 是此页内核实际使用的 Python。先确认路径，再解释后面打印的 verl 和 CUDA 版本。
 assert sys.executable.startswith('/opt/verl-venv/')
 assert torch.cuda.is_available()
 project=Path.cwd().parent
@@ -56,7 +57,8 @@ md('''## 3 · 启动训练并实时读取日志
 Notebook 只显示关键事件和指标，完整原始日志仍保存。中断本格会终止本次启动的进程组；不要同时运行多个副本。超时为 10 分钟，异常退出会明确报错。不会停止用户另行启动的 Ray 作业。
 
 重跑只读模式不会改动权重；重跑训练模式会从随机初始化重新开始，而非续训。''')
-code('''RUN_TRAINING=False
+code('''# False 跳过启动命令，直接读最近一次运行记录；首次运行需要先生成记录。True 才会启动新的训练进程。
+RUN_TRAINING=False
 if RUN_TRAINING:
     process=subprocess.Popen(['bash',str(scripts/'run.sh')],cwd=project,stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,text=True,bufsize=1,start_new_session=True)
@@ -76,6 +78,7 @@ if RUN_TRAINING:
         try:process.wait(timeout=10)
         except subprocess.TimeoutExpired:
             os.killpg(process.pid,signal.SIGKILL);process.wait()
+# latest_run.txt 保存的是本次训练目录的路径。先读出路径，再去那个目录找日志、指标或检查点。
 run_root=Path((scripts/'latest_run.txt').read_text().strip())
 assert (run_root/'train.log').exists()
 print('本格模式：', '刚完成新训练' if RUN_TRAINING else '读取已完成实测，不重新训练')
@@ -94,10 +97,12 @@ md('''## 4 · 验证更新：梯度、参数与检查点
 code('''import importlib.util
 spec=importlib.util.spec_from_file_location('advanced11_verify',scripts/'verify.py')
 module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+# 从训练产物核对更新：changed_tensors 数有变化的张量，max_abs_weight_change 给出最大的单元素绝对变化。
 result=module.verify(run_root)
 print('变化张量:',result['changed_tensors'],'/',result['total_tensors'])
 print('最大权重差:',result['max_abs_weight_change'])
 print('Ray 内存压力记录:',result['ray_memory_pressure'])
+# 先看 grad_norm 判断这一步的梯度大小，再读 rewards/mean 看采样得分。timing_s/gen 和 update_actor 分别计生成与参数更新的耗时。
 keys=['actor/grad_norm','actor/pg_loss','critic/rewards/mean','timing_s/gen','timing_s/update_actor','timing_s/save_checkpoint','perf/max_memory_allocated_gb']
 display(pd.DataFrame([(key,result['metrics'].get(key)) for key in keys],columns=['metric','value']))
 display(pd.DataFrame(result['checkpoint_files'],columns=['saved_file']))
@@ -116,6 +121,12 @@ code('''summary_dir=Path('support/experiment11_output');summary_dir.mkdir(exist_
 print('Notebook 侧报告:',summary_dir.resolve())
 print('原始训练日志与完整检查点:',run_root)
 print('高级第一课完成：真实 verl 单步 GRPO 工程验证。')''')
+md('''---
+
+<a href="https://github.com/SergioTermann"><img src="support/assets/logo.png" alt="SergioTermann" width="44" height="44" align="left" style="margin: 0 12px 0 0;"></a>
+
+**更多有趣的 AI 课程**  
+[← 访问 SergioTermann 的 GitHub 主页](https://github.com/SergioTermann)''')
 for i,c in enumerate(cells):c['id']=f'advanced11-{i:02d}'
 meta=dict(kernelspec=dict(display_name='Python (verl GPU)',language='python',name='verl-gpu'),language_info=dict(name='python',version='3.12'))
-(ROOT/'11_real_verl_training.ipynb').write_text(json.dumps(dict(nbformat=4,nbformat_minor=5,cells=cells,metadata=meta),ensure_ascii=False,indent=2),encoding='utf-8')
+(ROOT/'11_运行单步GRPO训练.ipynb').write_text(json.dumps(dict(nbformat=4,nbformat_minor=5,cells=cells,metadata=meta),ensure_ascii=False,indent=2),encoding='utf-8')

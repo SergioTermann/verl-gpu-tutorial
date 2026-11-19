@@ -2,13 +2,13 @@
 import json
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
-nb5=json.loads((ROOT/'05_model_playground.ipynb').read_text(encoding='utf-8'))
+nb5=json.loads((ROOT/'05_用交互评估台检验模型.ipynb').read_text(encoding='utf-8'))
 generation=[''.join(c['source']) for c in nb5['cells'] if c['cell_type']=='code'][1]
 generation=generation[:generation.index('for name,model in models.items():')]
 cells=[]
 def md(s):cells.append(dict(cell_type='markdown',metadata={},source=s))
 def code(s):cells.append(dict(cell_type='code',metadata={},source=s,outputs=[],execution_count=None))
-md('''# 实验 07 · 学会一列，再逐位完成长加法
+md('''# 实验 07 · 逐位推理与长整数加法
 
 第六课的模型在训练覆盖范围内表现较好，但仍无法处理 70 至 99 的测试题。本课尝试另一种表示方式：小网络只学习一列的加法，即“两个数字和输入进位，得到结果数字和输出进位”，程序再从右到左重复调用网络。
 
@@ -54,6 +54,7 @@ x=features(inputs)
 history=[];live=display('',display_id=True);start=time.perf_counter()
 for step in range(1001):
     logits=network(x)
+    # 每个局部输入对应一个正确类别。交叉熵衡量模型给该类别的概率；再看 table_accuracy，判断整张局部规则表学会了多少。
     loss=F.cross_entropy(logits,targets)
     if step%100==0:
         acc=(logits.argmax(-1)==targets).float().mean().item()
@@ -204,6 +205,12 @@ record=dict(seed=SEED,steps=1000,lr=0.003,training_states=states,
     disclosure='All 200 local states trained; explicit column traversal and carry propagation supplied by programmer.')
 (out/'results.json').write_text(json.dumps(record,ensure_ascii=False,indent=2),encoding='utf-8')
 print('已保存:',out.resolve())''')
+md('''---
+
+<a href="https://github.com/SergioTermann"><img src="support/assets/logo.png" alt="SergioTermann" width="44" height="44" align="left" style="margin: 0 12px 0 0;"></a>
+
+**更多有趣的 AI 课程**  
+[← 访问 SergioTermann 的 GitHub 主页](https://github.com/SergioTermann)''')
 for i,c in enumerate(cells):c['id']=f'exp07-{i:02d}'
 metadata=dict(kernelspec=dict(display_name='Python (verl GPU)',language='python',name='verl-gpu'),language_info=dict(name='python',version='3.12'))
-(ROOT/'07_column_reasoning.ipynb').write_text(json.dumps(dict(nbformat=4,nbformat_minor=5,metadata=metadata,cells=cells),ensure_ascii=False,indent=2),encoding='utf-8')
+(ROOT/'07_逐位推理与长整数加法.ipynb').write_text(json.dumps(dict(nbformat=4,nbformat_minor=5,metadata=metadata,cells=cells),ensure_ascii=False,indent=2),encoding='utf-8')

@@ -16,6 +16,12 @@ def code(text):
 
 
 def save(name):
+    md('''---
+
+<a href="https://github.com/SergioTermann"><img src="support/assets/logo.png" alt="SergioTermann" width="44" height="44" align="left" style="margin: 0 12px 0 0;"></a>
+
+**更多有趣的 AI 课程**  
+[← 访问 SergioTermann 的 GitHub 主页](https://github.com/SergioTermann)''')
     for index, cell in enumerate(cells):
         cell['id'] = f'{name[:2]}-{index:02d}'
         cell['source'] = cell['source'].splitlines(keepends=True)
@@ -26,7 +32,7 @@ def save(name):
     cells.clear()
 
 
-md(r'''# 第 13 课 · 从目标函数到正确的梯度
+md(r'''# 实验 13 · 从目标函数推导策略梯度
 
 完成前 12 课后，你已经见过参数更新。本课要求你能解释每个张量为何存在，并通过反例发现实现错误。使用 CPU 即可，不依赖前课权重。
 
@@ -49,6 +55,7 @@ torch.manual_seed(13)
 ids = torch.tensor([[1, 2, 3, 4, 0]])  # 两个提示 token、答案、EOS、padding
 labels = torch.tensor([[-100, -100, 3, 4, -100]])
 logits = torch.randn(1, 5, 6, requires_grad=True)
+# 位置 t 的输出预测位置 t+1，所以预测去掉末位、标签去掉首位。标签为 -100 的提示和填充位置不计入损失。
 loss = F.cross_entropy(logits[:, :-1].reshape(-1, 6), labels[:, 1:].reshape(-1), ignore_index=-100)
 manual = -(logits.log_softmax(-1)[0, 1, 3] + logits.log_softmax(-1)[0, 2, 4])/2
 assert torch.allclose(loss, manual)
@@ -66,6 +73,7 @@ rewards = torch.tensor([0., 1., 0., 0.], dtype=torch.float64)
 probs = scores.softmax(-1)
 exact = -(probs * rewards).sum()
 g_exact, = torch.autograd.grad(exact, scores, retain_graph=True)
+# detach 把采样概率当作固定权重，仅让 log 概率贡献梯度。下面用 g_exact 作对照，可以直接看到漏掉 detach 的后果。
 surrogate = -(probs.detach() * rewards * probs.log()).sum()
 g_surrogate, = torch.autograd.grad(surrogate, scores, retain_graph=True)
 wrong = -(probs * rewards * probs.log()).sum()
@@ -92,6 +100,7 @@ assert advantages[2, 1] > 0 and advantages[2, 0] < 0
 ratios = torch.tensor([[1.4, 1.4, 1.0], [.6, .6, 1.0]], requires_grad=True)
 adv = torch.tensor([[1.], [-1.]])
 mask = torch.tensor([[1., 1., 0.], [1., 1., 0.]])
+# 对正、负优势分别看裁剪方向：本例 1.4 已高于正优势上界，0.6 已低于负优势下界；继续往该方向移动不会增加目标值。
 terms = torch.minimum(ratios*adv, ratios.clamp(.8, 1.2)*adv)
 clipped_loss = -(terms*mask).sum()/mask.sum()
 clipped_loss.backward()
@@ -102,6 +111,7 @@ print('PASS: 全同奖励无相对信号；有利方向超限后梯度被裁剪�
 values = torch.tensor([[1., 0., 0.], [3., 3., 3.]])
 m = torch.tensor([[1., 0., 0.], [1., 1., 1.]])
 token_mean = (values*m).sum()/m.sum()
+# 先按每行有效 token 数归一化，再平均各行，每条回答权重相同。对照上一行，算算一长一短两条回答各占多少。
 sequence_mean = ((values*m).sum(-1)/m.sum(-1)).mean()
 print('token mean:', float(token_mean), 'sequence mean:', float(sequence_mean))
 assert token_mean != sequence_mean''')
@@ -113,6 +123,7 @@ md(r'''## 4 · KL 估计与代码审查
 code('''p = torch.tensor([.1, .2, .7], dtype=torch.float64)
 q = torch.tensor([.3, .3, .4], dtype=torch.float64)
 d = q.log()-p.log()
+# 这里 d=log(q/p)，所以 exp(d) 就是 q/p。接下来按 p 加权求和，检验这个估计式与离散分布的精确 KL 是否一致。
 k3 = d.exp()-d-1
 exact_kl = (p*(p.log()-q.log())).sum()
 assert torch.allclose((p*k3).sum(), exact_kl)
@@ -130,9 +141,9 @@ md('''## 5 · 验收：你能否发现“跑得动”的错误
 交付一页审查记录：写出张量形状、被优化的目标、三个可能静默出错的位置。仅通过断言不足以证明完整算法正确。
 
 参考：[DeepSeekMath](https://arxiv.org/abs/2402.03300)、[PPO](https://arxiv.org/abs/1707.06347)、[PyTorch autograd](https://pytorch.org/docs/stable/autograd.html)。下一课把理论用于修复冷启动。''')
-save('13_objectives_and_gradients.ipynb')
+save('13_从目标函数推导策略梯度.ipynb')
 
-md('''# 第 14 课 · 用 SFT 预热诊断奖励冷启动
+md('''# 实验 14 · 用监督微调预热 GRPO
 
 第 12 课有 3 步出现非零梯度，但固定测试的合法输出率与准确率均为零。可能的问题包括输出协议未学会、输入含 UNK、奖励过于稀疏，以及训练预算不足。本课先验证一个可检验的假设：监督预热能否让模型稳定输出合法答案？
 
@@ -184,6 +195,7 @@ code('''def live(history):
     axes[1].set(ylim=(-.05, 1.05), title='Validation only', xlabel='Step'); axes[1].legend()
     plt.tight_layout(); plt.show(); plt.close(fig)
     print(frame.tail(1).to_string(index=False))
+# 使用带标准答案的样本先做 SFT。history 记录训练过程，返回的 model 随后导出，作为真实 GRPO 的起点。
 model, history = lesson.warmup(tokenizer, initial, splits, steps=200, seed=SEED, callback=live)
 manifest = lesson.export(run, tokenizer, model, initial, splits, history, seed=SEED)
 print('模型、数据与配置已导出:', run)''')
@@ -220,7 +232,8 @@ print('完成后在下一格启用读取；未运行时不生成 GRPO 成绩。'
 md('''## 5 · 读取真实检查点，或明确标记尚未运行
 
 仅加载自己生成的可信检查点。FSDP 文件可能包含 pickle 对象。默认跳过读取，避免误把旧目录当作新训练。启用后对同一测试题作配对比较，第 15 课介绍如何量化不确定性。''')
-code('''READ_GRPO = False
+code('''# 打开开关前先运行上一节打印的训练命令；这个分支负责读取真实 GRPO 产物并评估。
+READ_GRPO = False
 if READ_GRPO:
     completed = Path((run/'latest_successful_grpo.txt').read_text().strip())
     display(lesson.evaluate_grpo(completed, out))
@@ -233,9 +246,9 @@ md('''## 6 · 工程验收与下一次实验
 进一步研究请预先注册三个分支：冻结 SFT、继续 SFT、SFT 后 GRPO。记录每个分支的 GPU 时间、生成 token 数、监督标签使用量与至少三个随机种子，不将更新次数相同称为算力相同。
 
 下一项消融应把“补齐词表”“仅格式预热”“任务预热”分别控制，使用新的评估划分。每次只改变一个因素，保留失败运行。课后参考：[verl GRPO 示例](https://verl.readthedocs.io/en/latest/examples/grpo_example.html)。''')
-save('14_sft_warmup_and_verl.ipynb')
+save('14_用监督微调预热GRPO.ipynb')
 
-md('''# 第 15 课 · 评估改进是否可信
+md('''# 实验 15 · 估计评估结果的不确定性
 
 博士训练中的统计判断要延伸到模型评估：同一测试集上的模型差异是配对数据；同一模型多次采样不是多个独立训练种子；反复调参会消耗测试集的独立性。
 
@@ -261,6 +274,7 @@ def bool_values(series):
     assert result.notna().all(), '未知布尔值'
     return result.astype(int)
 df['score'] = bool_values(df.correct)
+# 把同一题的冷启动和 SFT 结果对齐在一行。相减得到逐题变化，后续抽样才能保留配对关系。
 paired = df.pivot(index='number', columns='stage', values='score')
 assert {'cold','sft'} <= set(paired.columns) and not paired[['cold','sft']].isna().any().any()
 display(paired.head())
@@ -274,6 +288,7 @@ code('''delta = (paired.sft-paired.cold).to_numpy(dtype=float)
 rng = np.random.default_rng(15015)
 indices = rng.integers(0, len(delta), size=(10000,len(delta)))
 boot = delta[indices].mean(axis=1)
+# 从重采样得到的准确率差中取两个分位点。这里估计的是题目抽样的不确定性；训练种子之间的波动需要多次训练来估计。
 lo, hi = np.quantile(boot, [.025,.975])
 improved = int((delta>0).sum()); worsened = int((delta<0).sum())
 print(f'准确率差: {delta.mean():.1%}; 配对 bootstrap 95% 区间: [{lo:.1%}, {hi:.1%}]')
@@ -316,9 +331,9 @@ md('''## 4 · 从单次演示到可发表、可上线的证据
 | 线上是否改善 | 预先定义的业务指标、延迟、成本与回滚阈值 | 离线分数直接等于用户收益 |
 
 毕业作业：至少三个训练种子，对同一最终题集保存预测；分别报告种子变异与题目不确定性。若要合并估计，说明层级重采样结构，不把所有 seed×题目行当成独立观测。保留每次运行，而不是挑最好的种子。''')
-save('15_evaluation_and_uncertainty.ipynb')
+save('15_估计评估结果的不确定性.ipynb')
 
-md(r'''# 第 16 课 · 显存、吞吐与训练瓶颈
+md(r'''# 实验 16 · 测量显存与训练吞吐
 
 “GPU 可用”与“GPU 被有效利用”是两件事。本课练习建立资源模型、正确计时，并识别微基准的适用范围。需要 CUDA；无需前课权重。8GB 卡从小尺寸开始，先关闭其他训练内核。
 
@@ -359,6 +374,7 @@ try:
         for batch_size in [1,32,128]:
             x=torch.randn(batch_size,512,device='cuda')
             for _ in range(10): net(x)
+            # CUDA 调用可以提前把控制权还给 Python；同步会等已提交的 GPU 工作完成，再读时钟才有意义。
             torch.cuda.synchronize()
             torch.cuda.reset_peak_memory_stats()
             samples=[]; walls=[]
@@ -366,6 +382,7 @@ try:
                 start,end=torch.cuda.Event(enable_timing=True),torch.cuda.Event(enable_timing=True)
                 t=time.perf_counter(); start.record()
                 for _ in range(50): net(x)
+                # 结束事件进入 GPU 队列，等待它完成再读取时间。对照 GPU 事件计时和主机墙钟时间，留意两者覆盖的开销。
                 end.record(); end.synchronize()
                 walls.append((time.perf_counter()-t)*1000/50)
                 samples.append(start.elapsed_time(end)/50)
@@ -423,4 +440,4 @@ LoRA 学习低秩增量 $\Delta W=BA$，减少可训练参数、梯度及优化�
 课后交付：为第 14 课画出进程与显存归属图，记录一次真实训练的时间分解。选择一个瓶颈，只改一个参数，比较质量、耗时和峰值内存。完整的 LoRA、多卡和服务实验尚未包含在本课程的实测范围内，下一阶段验收要求见 [工程学习路线](support/docs/ENGINEERING_ROADMAP.md)。
 
 参考：[PyTorch profiler](https://pytorch.org/tutorials/recipes/recipes/profiler_recipe.html)、[AMP](https://pytorch.org/docs/stable/amp.html)、[LoRA](https://arxiv.org/abs/2106.09685)、[verl 性能调优](https://verl.readthedocs.io/en/latest/perf/perf_tuning.html)。''')
-save('16_memory_and_throughput.ipynb')
+save('16_测量显存与训练吞吐.ipynb')

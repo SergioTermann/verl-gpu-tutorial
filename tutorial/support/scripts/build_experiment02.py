@@ -13,7 +13,7 @@ def code(source):
     cells.append(dict(cell_type='code', metadata={}, source=source, outputs=[], execution_count=None))
 
 
-md('''# 实验 02 · 训练一个会生成答案的小语言模型
+md('''# 实验 02 · 训练微型语言模型
 
 上一课的策略只需在四个选项中选择。本课使用 Qwen2 因果 Transformer，从随机参数开始训练，让模型逐个字符生成加法答案。例如输入 `12+7=`，输出 `19`。
 
@@ -34,6 +34,7 @@ import matplotlib.pyplot as plt
 from IPython.display import display
 from transformers import Qwen2Config, Qwen2ForCausalLM
 
+# sys.executable 是此页内核实际使用的 Python。先确认路径，再解释后面打印的 verl 和 CUDA 版本。
 assert sys.executable.startswith('/opt/verl-venv/'), '请选择 Python (verl GPU)'
 assert torch.cuda.is_available(), '需要 CUDA GPU'
 SEED = 42
@@ -69,6 +70,7 @@ assert not {tuple(sorted(p)) for p in train_pairs} & {tuple(sorted(p)) for p in 
 
 def pack(pairs):
     ids = torch.full((len(pairs), MAX_LEN), PAD, dtype=torch.long)
+    # 先把所有位置标成 -100，交叉熵会跳过这些位置。再把答案区域填回 token ID，训练目标就只覆盖需要模型生成的部分。
     labels = torch.full_like(ids, -100)
     mask = torch.zeros_like(ids)
     for i, (a, b) in enumerate(pairs):
@@ -90,7 +92,8 @@ md('''## 3 · 创建微型 Qwen2，并记录训练前基线
 下面的生成函数只接收题目，不接收正确答案。按相同提示长度分组，逐步选择概率最大的下一个字符，最多生成 3 个 token（两位答案 + 结束符）。评估采用完整答案字符串精确匹配。
 
 这里使用 PyTorch SDPA 注意力，便于把重点放在训练逻辑。''')
-code('''config = Qwen2Config(vocab_size=len(vocab), hidden_size=128, intermediate_size=256,
+code('''# 这里定义网络结构。vocab_size 决定可预测的 token 数，hidden_size 决定每个位置的隐藏向量宽度。
+config = Qwen2Config(vocab_size=len(vocab), hidden_size=128, intermediate_size=256,
     num_hidden_layers=2, num_attention_heads=4, num_key_value_heads=2,
     max_position_embeddings=32, pad_token_id=PAD, eos_token_id=EOS,
     tie_word_embeddings=True, attention_dropout=0.0)
@@ -140,6 +143,7 @@ torch.cuda.reset_peak_memory_stats()
 for step in range(1, STEPS + 1):
     model.train()
     idx = torch.randint(len(train_pairs), (BATCH,), device=device)
+    # input_ids 是模型看到的序列；labels 指定要预测的 token。因果语言模型内部会把预测位置与下一个 token 对齐。
     loss = model(input_ids=train_ids[idx], attention_mask=train_mask[idx], labels=train_labels[idx]).loss
     assert torch.isfinite(loss), '损失出现 NaN/Inf'
     optimizer.zero_grad(set_to_none=True)
@@ -162,6 +166,7 @@ for step in range(1, STEPS + 1):
         live.update(fig)
         plt.close(fig)
         print(f"step {step:3d} | loss {row['loss']:.4f} | train {row['train']:.1%} | test {row['test']:.1%}", flush=True)
+# CUDA 调用可以提前把控制权还给 Python；同步会等已提交的 GPU 工作完成，再读时钟才有意义。
 torch.cuda.synchronize()
 elapsed = time.perf_counter()-start
 print(f'用时 {elapsed:.1f} 秒；PyTorch 峰值已分配显存 {torch.cuda.max_memory_allocated()/2**20:.1f} MiB（非整卡占用）')''')
@@ -209,9 +214,15 @@ md('''## 7 · 复盘与下一步
 先保存当前 `results.json` 的副本，再改 `STEPS=200`，从第 1 格开始重跑，比较欠训练时的结果。之后可尝试学习率 `0.001`，保持数据划分不变。每次都记录实际结果，不要只保留最好的一次。
 
 参考：[PyTorch 训练入门](https://pytorch.org/tutorials/beginner/basics/optimization_tutorial.html)、[Qwen2 模型接口](https://huggingface.co/docs/transformers/model_doc/qwen2)。''')
+md('''---
+
+<a href="https://github.com/SergioTermann"><img src="support/assets/logo.png" alt="SergioTermann" width="44" height="44" align="left" style="margin: 0 12px 0 0;"></a>
+
+**更多有趣的 AI 课程**  
+[← 访问 SergioTermann 的 GitHub 主页](https://github.com/SergioTermann)''')
 for i, cell in enumerate(cells):
     cell['id'] = f'exp02-{i:02d}'
 notebook = dict(nbformat=4, nbformat_minor=5, cells=cells,
     metadata=dict(kernelspec=dict(display_name='Python (verl GPU)', language='python', name='verl-gpu'),
                   language_info=dict(name='python', version='3.12')))
-(Path(__file__).resolve().parents[2] / '02_tiny_language_model.ipynb').write_text(json.dumps(notebook, ensure_ascii=False, indent=2), encoding='utf-8')
+(Path(__file__).resolve().parents[2] / '02_训练微型语言模型.ipynb').write_text(json.dumps(notebook, ensure_ascii=False, indent=2), encoding='utf-8')

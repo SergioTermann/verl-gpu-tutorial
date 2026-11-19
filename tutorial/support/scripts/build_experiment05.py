@@ -6,7 +6,7 @@ cells=[]
 def md(s): cells.append(dict(cell_type='markdown',metadata={},source=s))
 def code(s): cells.append(dict(cell_type='code',metadata={},source=s,outputs=[],execution_count=None))
 
-md('''# 实验 05 · 模型真的学会加法了吗？
+md('''# 实验 05 · 用交互评估台检验模型
 
 第四课保存了冻结基线、继续 SFT 和奖励微调三个模型。本课先把它们放进同一个交互面板，逐题比较答案，再改变数字范围和输入格式，检查它们在什么条件下容易出错。
 
@@ -122,6 +122,7 @@ md('''## 4 · 一张图看清能力边界
 
 以下静态表展示每个非训练分组的前 3 题与三组模型答案，不按正确与否挑选。所有题目的完整结果都会保存为 CSV。''')
 code('''order=[name for name,_,_ in suites]
+# 把长表按测试组和模型展开；沿同一行横向读，可以在相同题目集合上比较各模型的准确率。
 wide=summary.pivot(index='suite',columns='model',values='accuracy').reindex(order)
 ax=wide[['baseline','sft','rl']].plot.bar(figsize=(10,4),color=['#94a3b8','#2563eb','#059669'])
 ax.set(ylim=(0,1.05),ylabel='Strict exact-match accuracy',xlabel='',title='Same models, different evaluation conditions')
@@ -188,7 +189,13 @@ metadata=dict(seed=2026,decoding='greedy',max_new_tokens=4,strict_requires_eos=T
 assert hashes=={name:hashlib.sha256((root/name/'model.safetensors').read_bytes()).hexdigest() for name in models}
 print('评估结果已保存:',out.resolve())
 print('验证通过：第四课权重文件未改变。')''')
+md('''---
+
+<a href="https://github.com/SergioTermann"><img src="support/assets/logo.png" alt="SergioTermann" width="44" height="44" align="left" style="margin: 0 12px 0 0;"></a>
+
+**更多有趣的 AI 课程**  
+[← 访问 SergioTermann 的 GitHub 主页](https://github.com/SergioTermann)''')
 for i,c in enumerate(cells): c['id']=f'exp05-{i:02d}'
 nb=dict(nbformat=4,nbformat_minor=5,cells=cells,metadata=dict(kernelspec=dict(
     display_name='Python (verl GPU)',language='python',name='verl-gpu'),language_info=dict(name='python',version='3.12')))
-(Path(__file__).resolve().parents[2] / '05_model_playground.ipynb').write_text(json.dumps(nb,ensure_ascii=False,indent=2),encoding='utf-8')
+(Path(__file__).resolve().parents[2] / '05_用交互评估台检验模型.ipynb').write_text(json.dumps(nb,ensure_ascii=False,indent=2),encoding='utf-8')
