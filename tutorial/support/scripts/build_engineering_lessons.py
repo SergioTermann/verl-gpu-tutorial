@@ -2,7 +2,7 @@
 import json
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[2]
 cells = []
 
 
@@ -116,7 +116,7 @@ d = q.log()-p.log()
 k3 = d.exp()-d-1
 exact_kl = (p*(p.log()-q.log())).sum()
 assert torch.allclose((p*k3).sum(), exact_kl)
-out = Path('experiment13_output'); out.mkdir(exist_ok=True)
+out = Path('support/experiment13_output'); out.mkdir(exist_ok=True)
 (out/'checks.json').write_text(json.dumps(dict(shift=True, policy_gradient=True,
     clipping=True, masks=True, kl_identity=True, exact_kl=float(exact_kl)), indent=2))
 print('PASS: KL 期望一致。请继续完成下面的代码审查题。')''')
@@ -138,9 +138,9 @@ md('''# 第 14 课 · 用 SFT 预热诊断奖励冷启动
 
 我们显式改变协议：补上词表中的 `or`，使用三位数，固定新的 240/80/80 训练、验证、测试划分，各组奇偶平衡。三位数未用于第 12 课，但任务的个位规则相同。这是新实验，不把新旧分数差直接解释为单一改动的因果效果。
 
-需要 CUDA、transformers、tokenizers、pandas、pyarrow。无需下载模型。先关闭其他训练内核；每次完整执行创建独立目录。可在 [配套源码](advanced14/experiment.py) 查看所有实现。
+需要 CUDA、transformers、tokenizers、pandas、pyarrow。无需下载模型。先关闭其他训练内核；每次完整执行创建独立目录。可在 [配套源码](support/advanced14/experiment.py) 查看所有实现。
 
-历史验证记录：参考环境、种子 14014、固定 200 步 SFT 后，80 道测试题的合法率与准确率从冷启动的 0% 提高到 100%。再追加真实 verl 的 10 步 GRPO，准确率仍为 100%，其中 1 步有非零梯度。完整记录见 [验证说明](VALIDATION.md)；这是单次实测，不是预设的运行断言。
+历史验证记录：参考环境、种子 14014、固定 200 步 SFT 后，80 道测试题的合法率与准确率从冷启动的 0% 提高到 100%。再追加真实 verl 的 10 步 GRPO，准确率仍为 100%，其中 1 步有非零梯度。完整记录见 [验证说明](support/docs/VALIDATION.md)；这是单次实测，不是预设的运行断言。
 
 ## 1 · 检查协议与划分
 
@@ -151,7 +151,7 @@ import pandas as pd
 import torch
 import matplotlib.pyplot as plt
 from IPython.display import display, clear_output
-spec = importlib.util.spec_from_file_location('lesson14', Path('advanced14/experiment.py'))
+spec = importlib.util.spec_from_file_location('lesson14', Path('support/advanced14/experiment.py'))
 lesson = importlib.util.module_from_spec(spec); spec.loader.exec_module(lesson)
 assert torch.cuda.is_available(), '请选择支持 CUDA 的内核'
 SEED = 14014
@@ -199,7 +199,7 @@ predictions = pd.DataFrame(rows)
 summary = predictions.groupby('stage')[['valid','correct','eos']].mean()
 display(summary)
 display(predictions[predictions.stage=='sft'].head(10))
-out = Path('experiment14_output'); out.mkdir(exist_ok=True)
+out = Path('support/experiment14_output'); out.mkdir(exist_ok=True)
 predictions.to_csv(out/'predictions.csv', index=False)
 summary.to_csv(out/'summary.csv')
 pd.DataFrame(history).to_csv(out/'history.csv', index=False)
@@ -215,7 +215,7 @@ code('''import shlex
 del model, initial
 gc.collect(); torch.cuda.empty_cache()
 print('在已安装 verl 的项目根目录执行：')
-print('VERL_ADV14_ROOT=' + shlex.quote(str(run)) + ' bash tutorial/advanced14/run_grpo.sh')
+print('VERL_ADV14_ROOT=' + shlex.quote(str(run)) + ' bash tutorial/support/advanced14/run_grpo.sh')
 print('完成后在下一格启用读取；未运行时不生成 GRPO 成绩。')''')
 md('''## 5 · 读取真实检查点，或明确标记尚未运行
 
@@ -251,7 +251,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from IPython.display import display
-path = Path('experiment14_output/predictions.csv')
+path = Path('support/experiment14_output/predictions.csv')
 assert path.exists(), '请先完成第 14 课第 3 节'
 df = pd.read_csv(path, keep_default_na=False)
 df = df[df.split=='test'].copy()
@@ -299,7 +299,7 @@ for stage in ['cold','sft']:
     print(stage, successes, '/', len(paired), 'Wilson:', wilson(successes,len(paired)))
 assert wilson(0,20)[0] < 1e-12
 assert wilson(20,20)[1] > 1-1e-12
-out=Path('experiment15_output'); out.mkdir(exist_ok=True)
+out=Path('support/experiment15_output'); out.mkdir(exist_ok=True)
 report=dict(n=len(delta), delta=float(delta.mean()), paired_bootstrap_95=[float(lo),float(hi)],
     improved=improved, worsened=worsened, zero_of_20_one_sided_95_upper=upper,
     scope='Item uncertainty only; one training seed; approximate iid item assumption.')
@@ -392,7 +392,7 @@ code('''if torch.cuda.is_bf16_supported():
 else:
     relative_l2=None
     print('该 GPU 不支持 BF16，跳过本格比较。')
-out=Path('experiment16_output');out.mkdir(exist_ok=True)
+out=Path('support/experiment16_output');out.mkdir(exist_ok=True)
 pd.DataFrame(results).to_csv(out/'microbenchmark.csv',index=False)
 (out/'environment.json').write_text(json.dumps(dict(torch=torch.__version__,cuda=torch.version.cuda,
     gpu=torch.cuda.get_device_name(0),bf16_relative_l2=relative_l2,
@@ -420,7 +420,7 @@ LoRA 学习低秩增量 $\Delta W=BA$，减少可训练参数、梯度及优化�
 
 服务侧分别测首 token 延迟（TTFT）、后续 token 间隔（TPOT）、端到端延迟、并发下 p50/p95 与吞吐，并固定输入/输出长度和硬件。单请求快不意味着高并发稳定。
 
-课后交付：为第 14 课画出进程与显存归属图，记录一次真实训练的时间分解。选择一个瓶颈，只改一个参数，比较质量、耗时和峰值内存。完整的 LoRA、多卡和服务实验尚未包含在本课程的实测范围内，下一阶段验收要求见 [工程学习路线](ENGINEERING_ROADMAP.md)。
+课后交付：为第 14 课画出进程与显存归属图，记录一次真实训练的时间分解。选择一个瓶颈，只改一个参数，比较质量、耗时和峰值内存。完整的 LoRA、多卡和服务实验尚未包含在本课程的实测范围内，下一阶段验收要求见 [工程学习路线](support/docs/ENGINEERING_ROADMAP.md)。
 
 参考：[PyTorch profiler](https://pytorch.org/tutorials/recipes/recipes/profiler_recipe.html)、[AMP](https://pytorch.org/docs/stable/amp.html)、[LoRA](https://arxiv.org/abs/2106.09685)、[verl 性能调优](https://verl.readthedocs.io/en/latest/perf/perf_tuning.html)。''')
 save('16_memory_and_throughput.ipynb')

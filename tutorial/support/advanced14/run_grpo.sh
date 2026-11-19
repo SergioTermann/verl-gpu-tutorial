@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-cd "$(dirname "$0")/../.."
+cd "$(dirname "$0")/../../.."
 source "${VERL_VENV:-/opt/verl-venv}/bin/activate"
 export CUDA_VISIBLE_DEVICES=0 TOKENIZERS_PARALLELISM=false HYDRA_FULL_ERROR=1 WANDB_MODE=disabled OMP_NUM_THREADS=2
 artifact="${VERL_ADV14_ROOT:?Set VERL_ADV14_ROOT to the export directory printed by lesson 14}"
@@ -20,7 +20,7 @@ python -m verl.trainer.main_ppo \
  actor_rollout_ref.rollout.max_num_batched_tokens=64 actor_rollout_ref.rollout.max_num_seqs=64 \
  actor_rollout_ref.rollout.enforce_eager=true actor_rollout_ref.rollout.enable_chunked_prefill=false \
  actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=4 \
- custom_reward_function.path="$PWD/tutorial/advanced14/experiment.py" custom_reward_function.name=compute_score \
+ custom_reward_function.path="$PWD/tutorial/support/advanced14/experiment.py" custom_reward_function.name=compute_score \
  trainer.logger='[console]' trainer.project_name=verl_advanced trainer.experiment_name=warm_parity_grpo \
  trainer.n_gpus_per_node=1 trainer.nnodes=1 trainer.val_before_train=true trainer.test_freq=5 \
  trainer.total_epochs=10 trainer.total_training_steps=10 trainer.save_freq=10 \

@@ -2,7 +2,7 @@
 import json
 from pathlib import Path
 
-ROOT=Path(__file__).resolve().parent
+ROOT=Path(__file__).resolve().parents[2]
 previous=json.loads((ROOT/'05_model_playground.ipynb').read_text(encoding='utf-8'))
 generate_source=[''.join(c['source']) for c in previous['cells'] if c['cell_type']=='code'][1]
 generate_source=generate_source[:generate_source.index('for name,model in models.items():')]
@@ -18,7 +18,7 @@ md('''# 实验 06 · 用数据覆盖修复模型的薄弱环节
 
 我们另建从未被前面课程训练或评估过的最终测试数对，并隔离交换加数和格式变体。训练过程只查看验证集，固定跑完 2400 步；最终测试在训练结束后才运行一次。
 
-选择 **Python (verl GPU)**，从头 Shift+Enter。无需下载模型，依赖第四、第五课的保存结果。预期训练几十秒至数分钟。所有新文件写入 `experiment06_output/`。
+选择 **Python (verl GPU)**，从头 Shift+Enter。无需下载模型，依赖第四、第五课的保存结果。预期训练几十秒至数分钟。所有新文件写入 `support/experiment06_output/`。
 
 ## 1 · 冻结旧模型，复制待改进模型
 
@@ -35,9 +35,9 @@ assert torch.cuda.is_available(), '请选择 Python (verl GPU)'
 torch.set_num_threads(2)
 SEED=2027
 random.seed(SEED);torch.manual_seed(SEED);torch.cuda.manual_seed_all(SEED)
-root=Path('experiment04_output')
+root=Path('support/experiment04_output')
 prior=json.loads((root/'results.json').read_text(encoding='utf-8'))
-prior_eval=json.loads(Path('experiment05_output/evaluation.json').read_text(encoding='utf-8'))
+prior_eval=json.loads(Path('support/experiment05_output/evaluation.json').read_text(encoding='utf-8'))
 vocab=prior['vocab'];stoi={c:i for i,c in enumerate(vocab)};EOS=stoi['#'];PAD=stoi['_']
 baseline=Qwen2ForCausalLM.from_pretrained(root/'sft').cuda().eval().requires_grad_(False)
 model=copy.deepcopy(baseline).requires_grad_(True)
@@ -164,7 +164,7 @@ md('''## 6 · 保存模型、数据划分与实验记录
 保留当前结果，另建实验仅增加数字范围、不加前导零，然后用新的验证/最终划分比较格式泛化。这样才能更清楚地区分数字覆盖与格式增强各自的贡献。
 
 本课依然是监督训练；verl 强化学习流程需要另外集成 tokenizer、数据和奖励。先把数据边界和评估做好，再比较训练算法。''')
-code('''out=Path('experiment06_output');out.mkdir(exist_ok=True)
+code('''out=Path('support/experiment06_output');out.mkdir(exist_ok=True)
 model.save_pretrained(out/'model')
 details.to_csv(out/'all_predictions.csv',index=False);summary.to_csv(out/'summary.csv',index=False)
 record=dict(seed=SEED,steps=STEPS,batch=BATCH,lr=LR,elapsed_seconds=elapsed,vocab=vocab,

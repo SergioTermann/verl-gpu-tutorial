@@ -4,7 +4,7 @@
 
 欢迎使用中文学习入口。课程正文为中文，通过 Jupyter Notebook 逐格运行代码，学习 GPU 计算、监督微调、奖励学习、评估、复现和真实 verl 单卡训练。
 
-**[从课程首页开始](tutorial/00_START_HERE.ipynb)** · [详细目录](tutorial/README.md) · [高级课程](tutorial/ADVANCED.md)
+**[从课程首页开始](tutorial/00_START_HERE.ipynb)** · [详细目录](tutorial/support/docs/README.md) · [高级课程](tutorial/support/docs/ADVANCED.md)
 
 在 GitHub 上可以阅读教程源代码和说明；要执行代码、显示实时曲线和使用交互按钮，需要在本地启动 JupyterLab。
 
@@ -12,7 +12,7 @@
 
 | 课程 | 内容 |
 |---|---|
-| [01：GPU 与奖励学习入门](tutorial/verl_gpu_beginner.ipynb) | GPU 检查、CPU/GPU 对比与策略梯度 |
+| [01：GPU 与奖励学习入门](tutorial/01_verl_gpu_beginner.ipynb) | GPU 检查、CPU/GPU 对比与策略梯度 |
 | [02：微型语言模型训练](tutorial/02_tiny_language_model.ipynb) | 分词、监督训练、生成与测试 |
 | [03：组内奖励学习](tutorial/03_group_reward_learning.ipynb) | GRPO 风格教学循环、优势、裁剪与 KL |
 | [04：三组训练对照](tutorial/04_visible_learning_comparison.ipynb) | 冻结基线、继续 SFT 与奖励微调 |
@@ -31,7 +31,7 @@
 | [17：预训练模型 LoRA](tutorial/17_pretrained_lora.ipynb) | 聊天模板、回答掩码、适配器与合并验证 |
 | [18：本地流式服务](tutorial/18_streaming_service_benchmark.ipynb) | vLLM、HTTP 流式响应、并发与答案回归 |
 
-希望独立开展大模型工程实践，请结合[工程学习路线与考核](tutorial/ENGINEERING_ROADMAP.md)。17/18 已补入预训练模型 LoRA 和本地服务实验；多卡恢复、更大模型及生产负载仍需单独验证。
+希望独立开展大模型工程实践，请结合[工程学习路线与考核](tutorial/support/docs/ENGINEERING_ROADMAP.md)。17/18 已补入预训练模型 LoRA 和本地服务实验；多卡恢复、更大模型及生产负载仍需单独验证。
 
 第 17 课首次运行下载约 1GB 的固定版本 Qwen2.5-0.5B-Instruct，需 PEFT；基础模型与合并模型占用额外磁盘，权重在仓库外保存，遵循模型自身许可。第 18 课只启动临时本机服务，测试结束后自动关闭，不开放公网访问。
 
@@ -65,9 +65,9 @@
 高级脚本默认使用 WSL 环境 `/opt/verl-venv` 和 `/opt` 输出目录，请按自己的机器调整。`/path/to/verl` 是路径占位符。第 11、12 课默认读取本地已完成训练，首次使用应先在 verl 根目录运行对应脚本：
 
 ```bash
-bash tutorial/advanced11/run.sh
+bash tutorial/support/advanced11/run.sh
 # 学习第 12 课时再执行：
-bash tutorial/advanced12/run.sh
+bash tutorial/support/advanced12/run.sh
 ```
 
 ## 环境与结果边界

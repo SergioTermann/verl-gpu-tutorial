@@ -184,10 +184,10 @@ for (a,b),s in zip(my_questions,predict(my_questions)):
     print(f'[{split}] {a}+{b}= → {s!r}，正确答案 {a+b}')''')
 md('''## 6 · 保存权重与可复查的实验记录
 
-保存目录为 Notebook 所在目录下的 `experiment02_output/`。重复运行本格会覆盖该实验的上次保存；与第一课和 verl 的原始训练脚本无关。
+保存目录为 Notebook 所在目录下的 `support/experiment02_output/`。重复运行本格会覆盖该实验的上次保存；与第一课和 verl 的原始训练脚本无关。
 
 记录包括训练/测试划分、超参数、每次评估的结果及生成答案。下一次实验可以加载这个模型，再研究奖励函数与策略更新。''')
-code('''out = Path('experiment02_output')
+code('''out = Path('support/experiment02_output')
 out.mkdir(exist_ok=True)
 model.save_pretrained(out / 'model')
 record = dict(seed=SEED, steps=STEPS, batch_size=BATCH, learning_rate=0.002,
@@ -214,4 +214,4 @@ for i, cell in enumerate(cells):
 notebook = dict(nbformat=4, nbformat_minor=5, cells=cells,
     metadata=dict(kernelspec=dict(display_name='Python (verl GPU)', language='python', name='verl-gpu'),
                   language_info=dict(name='python', version='3.12')))
-Path(__file__).with_name('02_tiny_language_model.ipynb').write_text(json.dumps(notebook, ensure_ascii=False, indent=2), encoding='utf-8')
+(Path(__file__).resolve().parents[2] / '02_tiny_language_model.ipynb').write_text(json.dumps(notebook, ensure_ascii=False, indent=2), encoding='utf-8')

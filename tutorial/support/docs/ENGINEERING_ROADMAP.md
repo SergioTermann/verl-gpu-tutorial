@@ -6,12 +6,12 @@
 
 | 原有课程的边界 | 本次补充 | 仍需进一步验证 |
 |---|---|---|
-| 会运行 SFT/GRPO，但公式到实现的对应不够明确 | [13：目标函数与梯度](13_objectives_and_gradients.ipynb)，含 shift、detach、clip、mask、KL 断言 | 阅读所用版本 verl 的实际归一化与采样约定 |
-| 第 12 课停在失败诊断 | [14：SFT 预热与 verl 接口](14_sft_warmup_and_verl.ipynb)，实际预热与独立导出 | 多种子、继续 SFT 对照、词表/格式/任务的独立消融 |
-| 结果以单次准确率为主 | [15：评估不确定性](15_evaluation_and_uncertainty.ipynb)，配对预测与区间 | 真实业务数据、分层采样与最终留出集 |
-| GPU 检查缺少资源模型 | [16：显存与吞吐](16_memory_and_throughput.ipynb)，预算、正确计时和精度检查 | 更大模型、多卡与故障恢复 |
-| 缺少预训练模型交付 | [17：LoRA](17_pretrained_lora.ipynb)，模板、掩码、重载与合并检查 | 全量微调对照、多种子、量化 LoRA |
-| 缺少真实 HTTP 推理测量 | [18：流式服务](18_streaming_service_benchmark.ipynb)，vLLM 并发测试与回归 | 开环负载、长输出、错误注入与生产 SLA |
+| 会运行 SFT/GRPO，但公式到实现的对应不够明确 | [13：目标函数与梯度](../../13_objectives_and_gradients.ipynb)，含 shift、detach、clip、mask、KL 断言 | 阅读所用版本 verl 的实际归一化与采样约定 |
+| 第 12 课停在失败诊断 | [14：SFT 预热与 verl 接口](../../14_sft_warmup_and_verl.ipynb)，实际预热与独立导出 | 多种子、继续 SFT 对照、词表/格式/任务的独立消融 |
+| 结果以单次准确率为主 | [15：评估不确定性](../../15_evaluation_and_uncertainty.ipynb)，配对预测与区间 | 真实业务数据、分层采样与最终留出集 |
+| GPU 检查缺少资源模型 | [16：显存与吞吐](../../16_memory_and_throughput.ipynb)，预算、正确计时和精度检查 | 更大模型、多卡与故障恢复 |
+| 缺少预训练模型交付 | [17：LoRA](../../17_pretrained_lora.ipynb)，模板、掩码、重载与合并检查 | 全量微调对照、多种子、量化 LoRA |
+| 缺少真实 HTTP 推理测量 | [18：流式服务](../../18_streaming_service_benchmark.ipynb)，vLLM 并发测试与回归 | 开环负载、长输出、错误注入与生产 SLA |
 
 原有目录还残留“Notebook 自带输出”和未随仓库发布的启动脚本说明，这次一并改为实际安装与执行方式。第 12 课的记录是稀疏信号而非完全无梯度：10 步中 3 步非零梯度，贪心测试准确率未改善。
 

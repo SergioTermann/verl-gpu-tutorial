@@ -1,0 +1,51 @@
+# verl GPU 中文交互教程
+
+本课程共 18 课，以可编辑、可逐格运行的 Notebook 为主。课程首页为 [00_START_HERE.ipynb](../../00_START_HERE.ipynb)，安装方法见 [中文 README](../../../README.zh-CN.md)。
+
+## 基础课程
+
+| 课程 | 主要内容 |
+|---|---|
+| [01：GPU 与奖励学习](../../01_verl_gpu_beginner.ipynb) | 设备验证、计时与策略梯度 |
+| [02：微型语言模型](../../02_tiny_language_model.ipynb) | 分词、监督训练与生成 |
+| [03：组内奖励学习](../../03_group_reward_learning.ipynb) | 采样、优势、裁剪和 KL |
+| [04：三组训练对照](../../04_visible_learning_comparison.ipynb) | 冻结、继续 SFT 与奖励微调 |
+| [05：交互评估台](../../05_model_playground.ipynb) | 分布内外、格式与逐题错误 |
+| [06：数据覆盖](../../06_data_coverage.ipynb) | 分组隔离、验证与最终评估 |
+| [07：逐位推理](../../07_column_reasoning.ipynb) | 学习局部规则与人工算法 |
+| [08：采样与奖励漏洞](../../08_sampling_and_rewards.ipynb) | 温度、探索和奖励测试 |
+| [09：状态保存与恢复](../../09_checkpoints_and_reproducibility.ipynb) | 权重、优化器和随机状态 |
+| [10：verl 接口与基础验收](../../10_verl_bridge_and_graduation.ipynb) | 模型/tokenizer、Parquet 和配置 |
+
+## 高级课程
+
+从第 11 课开始验证真实 verl 训练，再把失败诊断推进到梯度、预热、评估和资源测量。
+
+| 课程 | 核心问题 | 运行依赖 |
+|---|---|---|
+| [11：单步 GRPO](../../11_real_verl_training.ipynb) | 参数更新和检查点是否真实发生？ | 先运行配套脚本，或开启训练开关 |
+| [12：稀疏奖励诊断](../../12_sparse_reward_diagnosis.ipynb) | 流程完成后，任务为何仍失败？ | 先运行 support/advanced12/run.sh |
+| [13：目标函数与梯度](../../13_objectives_and_gradients.ipynb) | 公式、mask 与梯度是否一致？ | CPU 即可，无前课权重依赖 |
+| [14：SFT 预热与 verl](../../14_sft_warmup_and_verl.ipynb) | 预热能否改善协议与任务表现？ | CUDA；真实 GRPO 是单独启动的可选步骤 |
+| [15：评估不确定性](../../15_evaluation_and_uncertainty.ipynb) | 改善有多大，证据有多强？ | 第 14 课逐题预测，CPU 即可 |
+| [16：显存与吞吐](../../16_memory_and_throughput.ipynb) | 资源花在哪里，怎样正确计时？ | CUDA，无前课权重依赖 |
+| [17：预训练模型 LoRA](../../17_pretrained_lora.ipynb) | 模板、掩码、适配器重载与合并是否可靠？ | CUDA、PEFT；首次下载约 1GB 权重 |
+| [18：本地流式服务](../../18_streaming_service_benchmark.ipynb) | 服务输出与并发指标是否可信？ | 第 17 课合并模型、vLLM；仅监听本机 |
+
+第 11 课使用合成奖励验证工程链路。第 12 课的历史结果是 10 步中 3 步非零梯度，贪心测试准确率未改善。第 14 课更换词表和数据范围，属于独立实验，不与第 12 课直接作同条件因果比较。
+
+首次克隆后没有本地模型、日志和检查点。请先执行相应训练；公开 Notebook 已清空输出，小型 JSON/CSV 是历史运行记录。每次训练以本轮配置与输出为准。
+
+学习要求、缺口审阅和后续全量微调对照、多卡及生产负载项目见 [工程学习路线与考核](ENGINEERING_ROADMAP.md)。
+
+## 如何运行与保存
+
+在安装了 verl 的项目根目录启动 `jupyter lab --notebook-dir=tutorial`，选择 Python (verl GPU) 内核，从上到下按 Shift + Enter。交互按钮要先执行对应初始化代码。完成后关闭内核释放资源；仅关闭网页标签不一定停止计算。
+
+第 02 课产物用于 03；第 04 课产物用于 05、06、08；第 06 课产物用于 07、10；第 09、13、16 课可独立执行。第 14 课重新初始化模型，15 使用其评估预测。先完成依赖课程的保存格，再进入下一课。
+
+结果通常写入 `support/experimentXX_output/`，重复保存会覆盖该目录中的报告。第 11、12、14 课的大型权重与训练日志放在独立 Linux 运行目录。公开报告用于参考，不保证不同设备或随机种子的结果一致。
+
+`support/scripts/build_*.py` 是 Notebook 生成工具，运行会覆盖对应 Notebook 的正文与输出。日常学习直接运行 Notebook；修改课程正文时应同步对应生成脚本。
+
+03/04 是教学版 PyTorch GRPO 风格循环；07 含人工竖式算法；10 只验证接口。完整真实训练从 11 开始。16 的 MLP 微基准不能替代大模型训练或推理服务压测。

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
-cd "$(dirname "$0")/../.."
+cd "$(dirname "$0")/../../.."
 export VERL_ADV12_ROOT="${VERL_ADV12_ROOT:-/opt/verl-advanced12/runs/$(date +%Y%m%d-%H%M%S)-$$}"
 mkdir -p "$VERL_ADV12_ROOT"
-printf "%s" "$VERL_ADV12_ROOT" > tutorial/advanced12/latest_run.txt
+printf "%s" "$VERL_ADV12_ROOT" > tutorial/support/advanced12/latest_run.txt
 source /opt/verl-venv/bin/activate
 export CUDA_VISIBLE_DEVICES=0
 export TOKENIZERS_PARALLELISM=false
@@ -11,7 +11,7 @@ export HYDRA_FULL_ERROR=1
 export WANDB_MODE=disabled
 export RAY_DEDUP_LOGS=0
 export OMP_NUM_THREADS=2
-python tutorial/advanced12/prepare.py
+python tutorial/support/advanced12/prepare.py
 python -m verl.trainer.main_ppo \
   reward.num_workers=1 \
   algorithm.adv_estimator=grpo \
@@ -38,7 +38,7 @@ python -m verl.trainer.main_ppo \
   actor_rollout_ref.rollout.enforce_eager=true \
   actor_rollout_ref.rollout.enable_chunked_prefill=false \
   actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=4 \
-  custom_reward_function.path="$PWD/tutorial/advanced12/reward.py" \
+  custom_reward_function.path="$PWD/tutorial/support/advanced12/reward.py" \
   custom_reward_function.name=compute_score \
   trainer.logger='[console]' \
   trainer.project_name=verl_advanced trainer.experiment_name=decimal_parity_grpo \
@@ -48,4 +48,4 @@ python -m verl.trainer.main_ppo \
   trainer.default_local_dir="$VERL_ADV12_ROOT/checkpoints" \
   trainer.resume_mode=disable \
   ray_kwargs.ray_init.num_cpus=4 \
-  2>&1 | tee "$VERL_ADV12_ROOT/train.log" tutorial/advanced12/train.log
+  2>&1 | tee "$VERL_ADV12_ROOT/train.log" tutorial/support/advanced12/train.log

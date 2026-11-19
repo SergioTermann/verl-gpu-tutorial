@@ -1,7 +1,7 @@
 """Build learned digit transition + explicit algorithm tutorial."""
 import json
 from pathlib import Path
-ROOT=Path(__file__).resolve().parent
+ROOT=Path(__file__).resolve().parents[2]
 nb5=json.loads((ROOT/'05_model_playground.ipynb').read_text(encoding='utf-8'))
 generation=[''.join(c['source']) for c in nb5['cells'] if c['cell_type']=='code'][1]
 generation=generation[:generation.index('for name,model in models.items():')]
@@ -145,7 +145,7 @@ md('''## 5 · 和第六课端到端模型做有限对照
 
 第六课模型并没有接受完整的 200 状态竖式表监督，也没有得到显式位循环。这一对照用于展示**结构先验如何改变泛化方式**。''')
 code('''from transformers import Qwen2ForCausalLM
-prior=Path('experiment06_output')
+prior=Path('support/experiment06_output')
 assert (prior/'model/model.safetensors').exists(), '请先完成第六课保存格'
 vocab=json.loads((prior/'results.json').read_text(encoding='utf-8'))['vocab']
 stoi={c:i for i,c in enumerate(vocab)};EOS=stoi['#']
@@ -186,14 +186,14 @@ display(widgets.VBox([a_box,b_box,button,area]))
 clicked(None)''')
 md('''## 7 · 保存结果与复盘
 
-保存局部网络权重、全部长数字测试结果、两位数 Qwen 对照和训练记录。输出独立保存到 `experiment07_output/`，不修改第六课权重。
+保存局部网络权重、全部长数字测试结果、两位数 Qwen 对照和训练记录。输出独立保存到 `support/experiment07_output/`，不修改第六课权重。
 
 回顾两种方法： 端到端模型需要从文本里学表示和计算；本课由人提供分解与组合规则，网络只拟合有限的局部真值表。长度泛化明显改善，但计算结构主要来自程序设计。若目标只是可靠加法，直接用确定性的计算器更简单，本实验的价值是理解归纳偏置和组合泛化。
 
 练习：在新实验中故意移除带进位的局部训练状态，观察长进位链怎样放大局部错误。不要把这项实验与本课完整真值表训练混为同一设置。
 
 这是独立的 PyTorch 教学实验，不是 verl 大语言模型训练结果。''')
-code('''out=Path('experiment07_output');out.mkdir(exist_ok=True)
+code('''out=Path('support/experiment07_output');out.mkdir(exist_ok=True)
 torch.save(network.state_dict(),out/'digit_network.pt')
 details.to_csv(out/'all_predictions.csv',index=False);summary.to_csv(out/'summary.csv',index=False)
 comparison.to_csv(out/'qwen_comparison.csv',index=False)

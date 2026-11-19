@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-root=Path(__file__).resolve().parent
+root=Path(__file__).resolve().parents[2]
 cells=[]
 def md(s):cells.append(dict(cell_type='markdown',metadata={},source=s))
 def code(s):cells.append(dict(cell_type='code',metadata={},source=s,outputs=[],execution_count=None))
@@ -21,7 +21,7 @@ code('''import json,sys,importlib.util
 from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
-scripts=Path('advanced12').resolve()
+scripts=Path('support/advanced12').resolve()
 run_root=Path((scripts/'latest_run.txt').read_text().strip())
 print('本课读取已完成的真实训练，不会自动重跑。')
 print('运行目录:',run_root)
@@ -76,13 +76,13 @@ md('''## 4 · 为什么从零 RL 容易失败？
 本 Notebook 读取并评估本地训练产物。首次使用或希望完整重跑时，在 WSL 已激活环境的项目目录执行：
 
 ```bash
-bash tutorial/advanced12/run.sh
+bash tutorial/support/advanced12/run.sh
 ```
 
 它会新建独立运行目录，从随机初始模型重来。完整日志和两次检查点留在 WSL；本格保存精简报告到工作区。预计数分钟；先关闭其他训练任务，别并发运行多个副本。
 
 这一课的结论是“真实训练完成，但任务奖励冷启动失败”，不是性能提升。下一课再设计预热与可比对照。''')
-code('''out=Path('experiment12_output');out.mkdir(exist_ok=True)
+code('''out=Path('support/experiment12_output');out.mkdir(exist_ok=True)
 (out/'report.json').write_text(json.dumps(report,indent=2))
 for name in ['evaluation.csv','metrics.csv','predictions.csv']:
     (out/name).write_bytes((run_root/name).read_bytes())

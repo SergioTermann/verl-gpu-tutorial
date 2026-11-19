@@ -18,7 +18,7 @@ md('''# 实验 05 · 模型真的学会加法了吗？
 
 ## 1 · 加载三组权重
 
-只读取 `experiment04_output/`。每组权重的 SHA-256 会写入评估报告，方便追溯实际测试的是哪个模型。''')
+只读取 `support/experiment04_output/`。每组权重的 SHA-256 会写入评估报告，方便追溯实际测试的是哪个模型。''')
 code('''import json, hashlib, random, time
 from pathlib import Path
 import torch
@@ -30,7 +30,7 @@ from transformers import Qwen2ForCausalLM
 
 assert torch.cuda.is_available(), '请选择 Python (verl GPU) 内核'
 torch.set_num_threads(2)
-root=Path('experiment04_output')
+root=Path('support/experiment04_output')
 assert (root/'results.json').exists(), '请先完成第四课的保存格'
 source=json.loads((root/'results.json').read_text(encoding='utf-8'))
 vocab=source['vocab']; stoi={c:i for i,c in enumerate(vocab)}; EOS=stoi['#']
@@ -173,12 +173,12 @@ print('静态示例（无需按钮也能查看）：')
 display(compare_values(25,30))''')
 md('''## 6 · 保存报告，不改变模型
 
-保存全部题目、原始输出、分组指标和来源权重哈希。最后重新计算权重文件哈希，确认没有覆盖第四课的模型。结果写入 `experiment05_output/`，重复运行会更新本课的报告。
+保存全部题目、原始输出、分组指标和来源权重哈希。最后重新计算权重文件哈希，确认没有覆盖第四课的模型。结果写入 `support/experiment05_output/`，重复运行会更新本课的报告。
 
 **复盘：** 高训练准确率不等于会做任意加法。若域内表现好、换数字或格式就失败，说明当前学习依赖训练分布。改进方向是更合理的数据覆盖、表示方式与独立评估，而不是只增加同一批题目的训练步数。
 
 后续可以设计“增加格式与范围覆盖”的训练实验，用训练/验证集决定设置，并另外保留全新的最终测试集。本课已查看的分布外题目之后就不能再声称是完全未见的最终评估。''')
-code('''out=Path('experiment05_output');out.mkdir(exist_ok=True)
+code('''out=Path('support/experiment05_output');out.mkdir(exist_ok=True)
 details.to_csv(out/'all_predictions.csv',index=False)
 summary.to_csv(out/'summary.csv',index=False)
 metadata=dict(seed=2026,decoding='greedy',max_new_tokens=4,strict_requires_eos=True,
@@ -191,4 +191,4 @@ print('验证通过：第四课权重文件未改变。')''')
 for i,c in enumerate(cells): c['id']=f'exp05-{i:02d}'
 nb=dict(nbformat=4,nbformat_minor=5,cells=cells,metadata=dict(kernelspec=dict(
     display_name='Python (verl GPU)',language='python',name='verl-gpu'),language_info=dict(name='python',version='3.12')))
-Path(__file__).with_name('05_model_playground.ipynb').write_text(json.dumps(nb,ensure_ascii=False,indent=2),encoding='utf-8')
+(Path(__file__).resolve().parents[2] / '05_model_playground.ipynb').write_text(json.dumps(nb,ensure_ascii=False,indent=2),encoding='utf-8')

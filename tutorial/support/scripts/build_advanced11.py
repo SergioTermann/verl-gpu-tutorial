@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-ROOT=Path(__file__).resolve().parent
+ROOT=Path(__file__).resolve().parents[2]
 cells=[]
 def md(s):cells.append(dict(cell_type='markdown',metadata={},source=s))
 def code(s):cells.append(dict(cell_type='code',metadata={},source=s,outputs=[],execution_count=None))
@@ -26,7 +26,7 @@ import torch
 assert sys.executable.startswith('/opt/verl-venv/')
 assert torch.cuda.is_available()
 project=Path.cwd().parent
-scripts=Path('advanced11').resolve()
+scripts=Path('support/advanced11').resolve()
 print('GPU:',torch.cuda.get_device_name(0))
 print('训练入口:',project/'verl/trainer/main_ppo.py')
 print('完整脚本：')
@@ -51,7 +51,7 @@ print('奖励函数（工程测试用途）：')
 print((scripts/'reward.py').read_text())''')
 md('''## 3 · 启动训练并实时读取日志
 
-`RUN_TRAINING=False` 时，本格读取本地最近一轮训练日志。首次克隆仓库后还没有这些日志，请先运行 `bash tutorial/advanced11/run.sh`，或将开关改为 `True` 后执行本格。训练模式会新建运行目录，分别保存模型、日志和检查点。
+`RUN_TRAINING=False` 时，本格读取本地最近一轮训练日志。首次克隆仓库后还没有这些日志，请先运行 `bash tutorial/support/advanced11/run.sh`，或将开关改为 `True` 后执行本格。训练模式会新建运行目录，分别保存模型、日志和检查点。
 
 Notebook 只显示关键事件和指标，完整原始日志仍保存。中断本格会终止本次启动的进程组；不要同时运行多个副本。超时为 10 分钟，异常退出会明确报错。不会停止用户另行启动的 Ray 作业。
 
@@ -110,7 +110,7 @@ md('''## 5 · 读取训练状态与下一步
 练习：先记录本轮配置和结果，再单独尝试 `rollout.n=4`，观察生成 token 数与资源变化。不要直接增加模型、批量和序列长度三个因素。
 
 下一课沿用这条训练链路，加入奇偶判断奖励和固定评估，诊断随机模型为什么难以开始学习。本课的参数更新验证了工程流程，回答质量则需要另行评估。''')
-code('''summary_dir=Path('experiment11_output');summary_dir.mkdir(exist_ok=True)
+code('''summary_dir=Path('support/experiment11_output');summary_dir.mkdir(exist_ok=True)
 (summary_dir/'verification.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
 (summary_dir/'run_script.sh').write_text((scripts/'run.sh').read_text(),encoding='utf-8')
 print('Notebook 侧报告:',summary_dir.resolve())

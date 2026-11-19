@@ -3,8 +3,8 @@ import ast
 import json
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
-tree = ast.parse((ROOT / 'lessons.py').read_text(encoding='utf-8'))
+ROOT = Path(__file__).resolve().parents[2]
+tree = ast.parse((ROOT / 'support' / 'scripts' / 'lessons.py').read_text(encoding='utf-8'))
 functions = {n.name: ast.unparse(ast.Module(body=n.body, type_ignores=[])) for n in tree.body if isinstance(n, ast.FunctionDef)}
 cells = []
 
@@ -17,7 +17,7 @@ def code(text):
     cells.append({'cell_type': 'code', 'metadata': {}, 'source': text, 'outputs': [], 'execution_count': None})
 
 
-md('''# 从 GPU 到 verl：动手入门
+md('''# 实验 01 · 从 GPU 到 verl：动手入门
 
 本课使用 verl 0.7.1，参考 GPU 为 RTX 4060 8GB，无需下载模型。
 
@@ -145,4 +145,4 @@ md('''## 6 · 从这个实验走向真实训练
 notebook = {'nbformat': 4, 'nbformat_minor': 5, 'metadata': {'kernelspec': {'display_name': 'Python (verl GPU)', 'language': 'python', 'name': 'verl-gpu'}, 'language_info': {'name': 'python', 'version': '3.12'}}, 'cells': cells}
 for i, cell in enumerate(cells):
     cell['id'] = f'lesson-{i:02d}'
-(ROOT / 'verl_gpu_beginner.ipynb').write_text(json.dumps(notebook, ensure_ascii=False, indent=2), encoding='utf-8')
+(ROOT / '01_verl_gpu_beginner.ipynb').write_text(json.dumps(notebook, ensure_ascii=False, indent=2), encoding='utf-8')

@@ -2,7 +2,7 @@
 import json
 from pathlib import Path
 
-ROOT=Path(__file__).resolve().parent
+ROOT=Path(__file__).resolve().parents[2]
 cells=[]
 
 
@@ -42,7 +42,7 @@ import pandas as pd
 import torch
 import matplotlib.pyplot as plt
 from IPython.display import display, clear_output
-spec=importlib.util.spec_from_file_location('lesson17',Path('advanced17/experiment.py'))
+spec=importlib.util.spec_from_file_location('lesson17',Path('support/advanced17/experiment.py'))
 lesson=importlib.util.module_from_spec(spec);spec.loader.exec_module(lesson)
 assert torch.cuda.is_available() and torch.cuda.is_bf16_supported(), '本实验需要支持 BF16 的 CUDA GPU'
 model_path=lesson.resolve_model()
@@ -76,11 +76,11 @@ md('''## 3 · 先做小批量拟合检查，再重置训练
 
 正式训练固定 60 次更新：micro batch=2、累积 4 次，有效 batch=8。不同微批按有效回答 token 数加权，使梯度对应整个累积批的 token 平均损失。每 10 步只查看验证集，固定最后一步用于测试。
 
-函数还检查优化器只更新 LoRA 参数，并对三个冻结基础张量做训练前后哈希比较。哈希是抽查，不是整个基础模型的逐字节校验。完整实现见 [experiment.py](advanced17/experiment.py)。
+函数还检查优化器只更新 LoRA 参数，并对三个冻结基础张量做训练前后哈希比较。哈希是抽查，不是整个基础模型的逐字节校验。完整实现见 [experiment.py](support/advanced17/experiment.py)。
 
 首次学习保持 `RUN_TRAINING=True`。重跑本格会新建目录并重新训练；仅想读取本地上次实验时改为 False。训练中曲线会持续更新。''')
 code('''RUN_TRAINING=True
-out=Path('experiment17_output');out.mkdir(exist_ok=True)
+out=Path('support/experiment17_output');out.mkdir(exist_ok=True)
 def live(history):
     clear_output(wait=True)
     frame=pd.DataFrame(history)
@@ -143,13 +143,13 @@ from IPython.display import display
 def module(name,path):
     spec=importlib.util.spec_from_file_location(name,path)
     value=importlib.util.module_from_spec(spec);spec.loader.exec_module(value);return value
-lesson=module('routing17',Path('advanced17/experiment.py'))
-serving=module('serving18',Path('advanced18/serving.py'))
-run=Path(Path('experiment17_output/latest_run.txt').read_text().strip())
+lesson=module('routing17',Path('support/advanced17/experiment.py'))
+serving=module('serving18',Path('support/advanced18/serving.py'))
+run=Path(Path('support/experiment17_output/latest_run.txt').read_text().strip())
 assert (run/'merged/config.json').exists(), '请先完成第 17 课的模型导出'
 splits=json.loads((run/'dataset.json').read_text())
 rows=splits['test']
-out=Path('experiment18_output');out.mkdir(exist_ok=True)
+out=Path('support/experiment18_output');out.mkdir(exist_ok=True)
 server_logs=run/f'serving-{time.time_ns()}'
 print('服务模型:',run/'merged')
 print('计分请求数:',len(rows)*3*3)''')

@@ -2,7 +2,7 @@
 import json
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[2]
 n2 = json.loads((ROOT/'02_tiny_language_model.ipynb').read_text(encoding='utf-8'))
 n3 = json.loads((ROOT/'03_group_reward_learning.ipynb').read_text(encoding='utf-8'))
 def sources(nb):
@@ -24,7 +24,7 @@ md('''# 实验 04 · 留出学习空间，看清训练带来的变化
 
 这是单随机种子的教学演示，不是统计显著性结论。两种训练有相同的更新次数和每次 128 条回答序列，但采样成本、题目多样性、监督信息量不同，不能称为等算力比较。
 
-选择 Python (verl GPU)，从头 Shift+Enter。无需模型下载，结果写入独立的 `experiment04_output/`，不覆盖前三课。''')
+选择 Python (verl GPU)，从头 Shift+Enter。无需模型下载，结果写入独立的 `support/experiment04_output/`，不覆盖前三课。''')
 md('''## 1 · 固定数据和随机种子
 沿用第二课 320 道训练题、80 道测试题；交换加数的题目仍在同一分组。''')
 code(c2[0]+'\nimport copy\n'+c2[1])
@@ -129,7 +129,7 @@ print('验证通过：冻结对照没有变化，RL 模型已更新。')
 ''')
 md('''## 7 · 保存证据
 保存三组权重、固定划分、所有测试答案和曲线记录。重复保存会覆盖本实验结果；与前三课输出分开。''')
-code('''out=Path('experiment04_output')
+code('''out=Path('support/experiment04_output')
 out.mkdir(exist_ok=True)
 for name,m in [('baseline',reference),('sft',sft_model),('rl',actor)]:
     m.save_pretrained(out/name)

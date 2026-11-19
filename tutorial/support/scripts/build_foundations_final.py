@@ -1,7 +1,7 @@
 """Generate final foundational lessons without rewriting previous experiments."""
 import json
 from pathlib import Path
-ROOT=Path(__file__).resolve().parent
+ROOT=Path(__file__).resolve().parents[2]
 metadata=dict(kernelspec=dict(display_name='Python (verl GPU)',language='python',name='verl-gpu'),language_info=dict(name='python',version='3.12'))
 cells=[]
 def md(s):cells.append(dict(cell_type='markdown',metadata={},source=s))
@@ -27,7 +27,7 @@ from pathlib import Path
 from transformers import Qwen2ForCausalLM
 assert torch.cuda.is_available()
 torch.set_num_threads(2)
-root=Path('experiment04_output')
+root=Path('support/experiment04_output')
 info=json.loads((root/'results.json').read_text())
 vocab=info['vocab'];stoi={c:i for i,c in enumerate(vocab)}
 model=Qwen2ForCausalLM.from_pretrained(root/'baseline').cuda().eval().requires_grad_(False)
@@ -67,7 +67,7 @@ audit=pd.DataFrame([dict(answer=s if len(s)<50 else s[:50]+'…',expected=e,loos
 assert all(strict_reward(s,12)==e for s,e in cases)
 display(audit)
 print('宽松奖励误判数量:',sum(loose_reward(s,12)!=e for s,e in cases))
-out=Path('experiment08_output');out.mkdir(exist_ok=True)
+out=Path('support/experiment08_output');out.mkdir(exist_ok=True)
 predictions.to_csv(out/'sampling.csv',index=False);audit.to_csv(out/'reward_audit.csv',index=False)
 summary.to_csv(out/'summary.csv')''')
 md('''## 3 · 小结与练习
@@ -111,7 +111,7 @@ advance(model,opt,20)
 checkpoint=copy.deepcopy(dict(model=model.state_dict(),optimizer=opt.state_dict(),step=20,
     torch_rng=torch.get_rng_state(),cuda_rng=torch.cuda.get_rng_state_all(),
     python_rng=random.getstate(),numpy_rng=np.random.get_state()))
-out=Path('experiment09_output');out.mkdir(exist_ok=True)
+out=Path('support/experiment09_output');out.mkdir(exist_ok=True)
 torch.save(checkpoint,out/'trusted_training_checkpoint.pt')
 continuous_losses=advance(model,opt,20)
 continuous=copy.deepcopy(model.state_dict())
@@ -172,10 +172,10 @@ from tokenizers import Tokenizer,models,pre_tokenizers,decoders
 from transformers import PreTrainedTokenizerFast,Qwen2ForCausalLM,AutoTokenizer
 from omegaconf import OmegaConf
 
-source=Path('experiment06_output')
+source=Path('support/experiment06_output')
 record=json.loads((source/'results.json').read_text())
 vocab=record['vocab']
-out=Path('experiment10_output').resolve();out.mkdir(exist_ok=True)
+out=Path('support/experiment10_output').resolve();out.mkdir(exist_ok=True)
 model_dir=out/'model'
 mapping={c:i for i,c in enumerate(vocab)};mapping['[UNK]']=len(mapping)
 raw=Tokenizer(models.WordLevel(mapping,unk_token='[UNK]'))
@@ -286,11 +286,11 @@ md('''## 5 · 基础结业检查
 
 如果你已完成实验并能解释上述问题，就可以进入高级课程，进一步验证 verl 的完整训练流程。基础部分练习的 GPU 计算、训练信号、评估和状态恢复，会继续用于后面的排错。完整分布式训练、LoRA、大模型部署和多 GPU 优化属于后续进阶部分。''')
 code('''required={
-    'GPU experiment':'verl_gpu_beginner.ipynb','SFT':'experiment02_output/results.json',
-    'RL':'experiment03_output/results.json','controls':'experiment04_output/results.json',
-    'evaluation':'experiment05_output/evaluation.json','coverage':'experiment06_output/results.json',
-    'composition':'experiment07_output/results.json','reward audit':'experiment08_output/reward_audit.csv',
-    'resume':'experiment09_output/verification.json'}
+    'GPU experiment':'01_verl_gpu_beginner.ipynb','SFT':'support/experiment02_output/results.json',
+    'RL':'support/experiment03_output/results.json','controls':'support/experiment04_output/results.json',
+    'evaluation':'support/experiment05_output/evaluation.json','coverage':'support/experiment06_output/results.json',
+    'composition':'support/experiment07_output/results.json','reward audit':'support/experiment08_output/reward_audit.csv',
+    'resume':'support/experiment09_output/verification.json'}
 checks={key:Path(value).exists() for key,value in required.items()}
 checks.update(tokenizer=(model_dir/'tokenizer.json').exists(),parquet=len(dataset)==32,config=result.returncode==0)
 display(pd.DataFrame(checks.items(),columns=['artifact_or_check','passed']))
@@ -309,7 +309,7 @@ md('''# GPU 与 verl 基础课程 · 首页
 
 | 课次 | 内容 | 学会什么 |
 |---|---|---|
-| [01](verl_gpu_beginner.ipynb) | GPU 与奖励学习入门 | 设备、计时、梯度、奖励 |
+| [01](01_verl_gpu_beginner.ipynb) | GPU 与奖励学习入门 | 设备、计时、梯度、奖励 |
 | [02](02_tiny_language_model.ipynb) | 微型 Qwen2 SFT | token、标签、生成、评估 |
 | [03](03_group_reward_learning.ipynb) | GRPO 风格教学循环 | 组采样、优势、裁剪、KL |
 | [04](04_visible_learning_comparison.ipynb) | 三组对照 | 冻结/SFT/RL、公平比较的边界 |
@@ -326,7 +326,7 @@ md('''# GPU 与 verl 基础课程 · 首页
 
 - 02 → 03；04 建立新起点并保留旧结果。
 - 04 → 05 → 06 → 07；08 使用 04；09 独立；10 使用 06 并检查课程产物。
-- 各课输出在 `experimentXX_output/`，重跑保存格会覆盖对应课输出。
+- 各课输出在 `support/experimentXX_output/`，重跑保存格会覆盖对应课输出。
 - `build_*.py` 是作者生成脚本，不是日常学习入口，运行会覆盖对应 Notebook 的修改和输出。
 - 在 verl 项目根目录运行 `jupyter lab --notebook-dir=tutorial`，打开终端打印的本机链接。安装步骤见仓库 README。
 
@@ -346,7 +346,7 @@ md('''## 高级课程
 | 课程 | 核心问题 | 运行依赖 |
 |---|---|---|
 | [11：单步 GRPO](11_real_verl_training.ipynb) | 参数更新和检查点是否真实发生？ | 先运行配套脚本，或开启训练开关 |
-| [12：稀疏奖励诊断](12_sparse_reward_diagnosis.ipynb) | 流程完成后，任务为何仍失败？ | 先运行 advanced12/run.sh |
+| [12：稀疏奖励诊断](12_sparse_reward_diagnosis.ipynb) | 流程完成后，任务为何仍失败？ | 先运行 support/advanced12/run.sh |
 | [13：目标函数与梯度](13_objectives_and_gradients.ipynb) | 公式、mask 与梯度是否一致？ | CPU 即可，无前课权重依赖 |
 | [14：SFT 预热与 verl](14_sft_warmup_and_verl.ipynb) | 预热能否改善协议与任务表现？ | CUDA；真实 GRPO 是单独启动的可选步骤 |
 | [15：评估不确定性](15_evaluation_and_uncertainty.ipynb) | 改善有多大，证据有多强？ | 第 14 课逐题预测，CPU 即可 |
@@ -358,6 +358,6 @@ md('''## 高级课程
 
 首次克隆后没有本地模型、日志和检查点。请先执行相应训练；公开 Notebook 已清空输出，小型 JSON/CSV 是历史运行记录。每次训练以本轮配置与输出为准。
 
-学习要求、缺口审阅和后续全量微调对照、多卡及生产负载项目见 [工程学习路线与考核](ENGINEERING_ROADMAP.md)。
+学习要求、缺口审阅和后续全量微调对照、多卡及生产负载项目见 [工程学习路线与考核](support/docs/ENGINEERING_ROADMAP.md)。
 ''')
 save('00_START_HERE.ipynb')

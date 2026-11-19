@@ -6,13 +6,13 @@
 
 | 检查 | 结果 | 证据 |
 |---|---|---|
-| 13：标签错位、策略梯度、裁剪、mask、KL | 断言全部通过 | [checks.json](experiment13_output/checks.json) |
-| 14：固定 200 步 SFT | 测试合法率/准确率从 0%/0% 到 100%/100%，共 80 题 | [summary.csv](experiment14_output/summary.csv)、[逐题预测](experiment14_output/predictions.csv) |
-| 14：追加真实 verl GRPO | 10 步完成，1 步非零梯度；测试准确率仍为 100% | [报告](experiment14_output/grpo_report.json)、[逐步指标](experiment14_output/grpo_metrics.csv)、[逐题预测](experiment14_output/grpo_predictions.csv) |
-| 15：配对评估 | 80 题均改善；bootstrap 百分位区间退化为 [1,1] | [evaluation_audit.json](experiment15_output/evaluation_audit.json) |
-| 16：CUDA 微基准、BF16 数值检查 | 三种 batch 的重复计时完成，BF16 输出有限 | [microbenchmark.csv](experiment16_output/microbenchmark.csv)、[环境记录](experiment16_output/environment.json) |
+| 13：标签错位、策略梯度、裁剪、mask、KL | 断言全部通过 | [checks.json](../experiment13_output/checks.json) |
+| 14：固定 200 步 SFT | 测试合法率/准确率从 0%/0% 到 100%/100%，共 80 题 | [summary.csv](../experiment14_output/summary.csv)、[逐题预测](../experiment14_output/predictions.csv) |
+| 14：追加真实 verl GRPO | 10 步完成，1 步非零梯度；测试准确率仍为 100% | [报告](../experiment14_output/grpo_report.json)、[逐步指标](../experiment14_output/grpo_metrics.csv)、[逐题预测](../experiment14_output/grpo_predictions.csv) |
+| 15：配对评估 | 80 题均改善；bootstrap 百分位区间退化为 [1,1] | [evaluation_audit.json](../experiment15_output/evaluation_audit.json) |
+| 16：CUDA 微基准、BF16 数值检查 | 三种 batch 的重复计时完成，BF16 输出有限 | [microbenchmark.csv](../experiment16_output/microbenchmark.csv)、[环境记录](../experiment16_output/environment.json) |
 
-第 14 课的数据、种子与超参数见 [manifest.json](experiment14_output/manifest.json)，验证曲线原始点见 [history.csv](experiment14_output/history.csv)。SFT 与 GRPO 均使用固定最后一步，不按测试成绩选检查点。
+第 14 课的数据、种子与超参数见 [manifest.json](../experiment14_output/manifest.json)，验证曲线原始点见 [history.csv](../experiment14_output/history.csv)。SFT 与 GRPO 均使用固定最后一步，不按测试成绩选检查点。
 
 ## 怎样解释这些结果
 
@@ -26,7 +26,7 @@ GRPO 测试说明预热模型可以通过导出的 tokenizer、Parquet 和奖励
 
 ## 复现方式
 
-按 README 配置环境，运行四本 Notebook。第 14 课导出模型后，在终端执行其打印的 `VERL_ADV14_ROOT=... bash tutorial/advanced14/run_grpo.sh`；成功后将第 5 节的 `READ_GRPO=True` 再运行，即可从检查点重新评估并保存指标。读取只适用于自己生成的可信检查点。
+按 README 配置环境，运行四本 Notebook。第 14 课导出模型后，在终端执行其打印的 `VERL_ADV14_ROOT=... bash tutorial/support/advanced14/run_grpo.sh`；成功后将第 5 节的 `READ_GRPO=True` 再运行，即可从检查点重新评估并保存指标。读取只适用于自己生成的可信检查点。
 
 大型权重、训练原始日志与包含本机路径的运行指针未提交。代码会为新实验创建独立运行目录；再次执行报告保存格会覆盖工作区内同名小型报告。需要比较多个种子时，先为报告建立独立目录并保留每轮实验卡。
 
@@ -41,7 +41,7 @@ GRPO 测试说明预热模型可以通过导出的 tokenizer、Parquet 和奖励
 - 第一次 BF16 直接合并未通过原先的 0.02 相对 L2 检查线，误差为 0.04242。未放宽阈值；改在 FP32 下检查合并，误差为 0.000003168，通过预设 1e-4 阈值。
 - 导出 FP32 合并产物，在测试集上与 BF16 LoRA 的答案无分歧。这个答案一致性不代表所有输入或数值逐位一致。
 
-证据：[manifest](experiment17_output/manifest.json)、[合并与重载检查](experiment17_output/artifact_checks.json)、[逐题预测](experiment17_output/predictions.csv)、[合并模型预测](experiment17_output/merged_predictions.csv)、[数据划分](experiment17_output/dataset.json)。
+证据：[manifest](../experiment17_output/manifest.json)、[合并与重载检查](../experiment17_output/artifact_checks.json)、[逐题预测](../experiment17_output/predictions.csv)、[合并模型预测](../experiment17_output/merged_predictions.csv)、[数据划分](../experiment17_output/dataset.json)。
 
 ## 第 18 课：本地 vLLM 流式服务
 
@@ -55,4 +55,4 @@ GRPO 测试说明预热模型可以通过导出的 tokenizer、Parquet 和奖励
 
 这是短输出、关闭前缀缓存、eager 模式、闭环固定并发下的客户端测量。请求开始前在线程池内的等待不计入逐请求延迟；总吞吐窗口包含整个批次。不能将这些数字当作长输出、固定外部到达率或生产 SLA。启动耗时约 30 秒，单独记录，未计入稳态吞吐。
 
-证据：[逐请求指标](experiment18_output/requests.csv)、[分轮窗口](experiment18_output/windows.csv)、[汇总](experiment18_output/summary.csv)、[协议](experiment18_output/protocol.json)、[答案回归](experiment18_output/regression.json)。
+证据：[逐请求指标](../experiment18_output/requests.csv)、[分轮窗口](../experiment18_output/windows.csv)、[汇总](../experiment18_output/summary.csv)、[协议](../experiment18_output/protocol.json)、[答案回归](../experiment18_output/regression.json)。

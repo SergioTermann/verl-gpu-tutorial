@@ -35,7 +35,7 @@ from IPython.display import display
 from transformers import Qwen2ForCausalLM
 
 assert torch.cuda.is_available(), '请选择 Python (verl GPU) 内核'
-root = Path('experiment02_output')
+root = Path('support/experiment02_output')
 assert (root/'model/model.safetensors').exists(), '请先运行实验 02，包括最后的保存格'
 source = json.loads((root/'results.json').read_text(encoding='utf-8'))
 SEED = 123
@@ -229,7 +229,7 @@ assert all(p.grad is None for p in reference.parameters())
 print('检查通过：actor 确实更新，reference 参数保持不变且没有梯度。')''')
 md('''## 6 · 保存结果与 verl 概念对照
 
-保存到新的 `experiment03_output/`，不会覆盖第二课的初始模型。重复运行保存格会覆盖第三课上次输出。要重新做实验，应从第 1 格重跑；只重跑训练格会在已更新的 actor 上继续训练，不能当成相同起点的对照。
+保存到新的 `support/experiment03_output/`，不会覆盖第二课的初始模型。重复运行保存格会覆盖第三课上次输出。要重新做实验，应从第 1 格重跑；只重跑训练格会在已更新的 actor 上继续训练，不能当成相同起点的对照。
 
 | 本课对象 | verl 中的对应概念 |
 |---|---|
@@ -241,7 +241,7 @@ md('''## 6 · 保存结果与 verl 概念对照
 | `PROMPTS / GROUP / UPDATES` | 问题批量、回答数量与策略更新次数 |
 
 这些是概念映射，不保证教学代码与某个 verl 版本数值等价。这里的字符词表也还不是可直接交给 vLLM 的完整 tokenizer 集成。''')
-code('''out=Path('experiment03_output')
+code('''out=Path('support/experiment03_output')
 out.mkdir(exist_ok=True)
 actor.save_pretrained(out/'model')
 record=dict(seed=SEED,source_model_sha256=source_hash,vocab=vocab,
@@ -267,4 +267,4 @@ for i,c in enumerate(cells): c['id']=f'exp03-{i:02d}'
 nb=dict(nbformat=4,nbformat_minor=5,cells=cells,metadata=dict(
     kernelspec=dict(display_name='Python (verl GPU)',language='python',name='verl-gpu'),
     language_info=dict(name='python',version='3.12')))
-Path(__file__).with_name('03_group_reward_learning.ipynb').write_text(json.dumps(nb,ensure_ascii=False,indent=2),encoding='utf-8')
+(Path(__file__).resolve().parents[2] / '03_group_reward_learning.ipynb').write_text(json.dumps(nb,ensure_ascii=False,indent=2),encoding='utf-8')
