@@ -4,9 +4,7 @@
 
 <h1 align="center">verl GPU 中文交互教程</h1>
 
-<p align="center">
-  <strong>简体中文</strong> · <a href="README.en.md">English</a>
-</p>
+<p align="center">从 GPU 计算与监督微调，到单卡 GRPO 训练、评估与复现。</p>
 
 <p align="center">
   <a href="tutorial/support/docs/README.md"><img src="tutorial/support/assets/labs-zh.png" width="90" height="22" alt="verl 实验 · 18"></a>
@@ -14,9 +12,17 @@
   <a href="LICENSE"><img src="tutorial/support/assets/license-zh.png" width="86" height="22" alt="许可证 · MIT"></a>
 </p>
 
-通过 Jupyter Notebook 逐格运行代码，学习 GPU 计算、监督微调、奖励学习、评估、复现和真实 verl 单卡训练。
+<p align="center">
+  <strong>简体中文</strong> · <a href="README.en.md">English</a>
+</p>
 
-**[从课程首页开始](tutorial/00_课程导航.ipynb)** · [详细目录](tutorial/support/docs/README.md) · [高级课程](tutorial/support/docs/ADVANCED.md)
+<p align="center">
+  <strong><a href="tutorial/00_课程导航.ipynb">开始学习</a></strong> &nbsp;·&nbsp;
+  <a href="tutorial/support/docs/README.md">实验目录</a> &nbsp;·&nbsp;
+  <a href="tutorial/support/docs/ADVANCED.md">高级课程</a>
+</p>
+
+---
 
 在 GitHub 上可以阅读教程源代码和说明；要执行代码、显示实时曲线和使用交互按钮，需要在本地启动 JupyterLab。
 

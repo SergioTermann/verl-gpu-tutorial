@@ -4,9 +4,7 @@
 
 <h1 align="center">Interactive verl GPU Tutorial</h1>
 
-<p align="center">
-  <strong>English</strong> · <a href="README.md">简体中文</a>
-</p>
+<p align="center">From GPU fundamentals and supervised fine-tuning to single-GPU GRPO training and evaluation.</p>
 
 <p align="center">
   <a href="tutorial/support/docs/README.md"><img src="tutorial/support/assets/labs-en.png" width="89" height="22" alt="verl labs · 18"></a>
@@ -14,11 +12,19 @@
   <a href="LICENSE"><img src="tutorial/support/assets/license-en.png" width="92" height="22" alt="License · MIT"></a>
 </p>
 
-The notebooks are written in Simplified Chinese.
+<p align="center">
+  <strong>English</strong> · <a href="README.md">简体中文</a>
+</p>
 
-An 18-lesson Jupyter course covering GPU basics, supervised fine-tuning, GRPO, reproducibility, real single-GPU verl training, failure diagnosis, gradient checks, evaluation uncertainty, memory/throughput measurement, pretrained-model LoRA, and local streaming-service benchmarks.
+<p align="center">
+  <strong><a href="tutorial/00_课程导航.ipynb">Start here</a></strong> &nbsp;·&nbsp;
+  <a href="tutorial/support/docs/README.md">Lesson index</a> &nbsp;·&nbsp;
+  <a href="tutorial/support/docs/ADVANCED.md">Advanced lessons</a>
+</p>
 
-[Course home](tutorial/00_课程导航.ipynb) · [Lesson index](tutorial/support/docs/README.md) · [Advanced lessons](tutorial/support/docs/ADVANCED.md)
+---
+
+The 18 notebooks are written in Simplified Chinese. They cover reproducibility, failure diagnosis, gradient checks, evaluation uncertainty, memory and throughput, pretrained-model LoRA, and local streaming-service benchmarks.
 
 For a research-to-engineering learning path, see the Chinese [engineering roadmap and assessment](tutorial/support/docs/ENGINEERING_ROADMAP.md). Lessons 13–16 add executable exercises and distinguish micro-model evidence from larger-model, multi-GPU, and serving work still to be validated.
 
